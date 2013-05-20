@@ -4,33 +4,33 @@ surface = canvas.getContext("2d");
 
 function loadImage() 
 { 
-    //Update the sprite as soon as the image has been loaded
-    update(); 
+  //Update the sprite as soon as the image has been loaded
+  update(); 
 }
 
 window.collBR = false;
 
 var sprite = 
 { 
-    //The X and Y source position of the sprite's image and its height and width
-    srcX: 0, 
-    srcY: 0, 
-    srcW: 0, 
-    srcH: 0, 
-    //The X and Y position of the sprite on the canvas as well as its height
-    x: 0, 
-    y: 0, 
-    w: 10, 
-    h: 10,
-    //Getters
-    cx: function()
-    {
-      return this.x + (this.w / 2);
-    },
-    cy: function()
-    {
-      return this.y + (this.h / 2);
-    }
+  //The X and Y source position of the sprite's image and its height and width
+  srcX: 0, 
+  srcY: 0, 
+  srcW: 0, 
+  srcH: 0, 
+  //The X and Y position of the sprite on the canvas as well as its height
+  x: 0, 
+  y: 0, 
+  w: 10, 
+  h: 10,
+  //Getters
+  cx: function()
+  {
+    return this.x + (this.w / 2);
+  },
+  cy: function()
+  {
+    return this.y + (this.h / 2);
+  }
 }; 
 //An array to store the game sprites
 var sprites = []; 
@@ -92,46 +92,46 @@ function collision()
 
 function update() 
 { 
-    //Create the animation loop
-    window.requestAnimationFrame(update, canvas); 
-    render(); 
+  //Create the animation loop
+  window.requestAnimationFrame(update, canvas); 
+  render(); 
 } 
 
 function render() 
 { 
-    //Clear the previous animation frame
-    surface.clearRect(0, 0, canvas.width, canvas.height);
-    //Loop through all the sprites in the "sprites" array and use their properties to display them
-    if(sprites.length !== 0)
+  //Clear the previous animation frame
+  surface.clearRect(0, 0, canvas.width, canvas.height);
+  //Loop through all the sprites in the "sprites" array and use their properties to display them
+  if(sprites.length !== 0)
+  { 
+    for(var i = 0; i < sprites.length; i++) 
     { 
-        for(var i = 0; i < sprites.length; i++) 
-        { 
-            switch(i)
-            {
-                case 0:
-                    var sprite = sprites[i]; 
-                    surface.drawImage 
-                    ( 
-                        imgRedBall, 
-                        sprite.srcX, sprite.srcY, 
-                        sprite.srcW, sprite.srcH, 
-                        Math.floor(sprite.x), Math.floor(sprite.y), 
-                        sprite.w, sprite.h 
-                    );
-                    break;
-                case 1:
-                    var sprite = sprites[i]; 
-                    surface.drawImage 
-                    ( 
-                        imgBlueBall, 
-                        sprite.srcX, sprite.srcY, 
-                        sprite.srcW, sprite.srcH, 
-                        Math.floor(sprite.x), Math.floor(sprite.y), 
-                        sprite.w, sprite.h 
-                    );
-            }
-        } 
+      switch(i)
+      {
+        case 0:
+          var sprite = sprites[i]; 
+          surface.drawImage 
+          ( 
+            imgRedBall, 
+            sprite.srcX, sprite.srcY, 
+            sprite.srcW, sprite.srcH, 
+            Math.floor(sprite.x), Math.floor(sprite.y), 
+            sprite.w, sprite.h 
+          );
+          break;
+        case 1:
+          var sprite = sprites[i]; 
+          surface.drawImage 
+          ( 
+              imgBlueBall, 
+              sprite.srcX, sprite.srcY, 
+              sprite.srcW, sprite.srcH, 
+              Math.floor(sprite.x), Math.floor(sprite.y), 
+              sprite.w, sprite.h 
+        );
+      }
     } 
+  } 
 }
 
 canvas.addEventListener("mousemove", function(event)
