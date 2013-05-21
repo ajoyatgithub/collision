@@ -32,22 +32,39 @@ function moveRed()
     x = rball.x + rball.vx * rball.sp;
     y = rball.y + rball.vy * rball.sp;
     right = rball.w + x;
+    left = x;
+    top = y;
+    bottom = y + rball.h;
     if(right > canvas.width)
     {
       diff = right - canvas.width;
       rball.vx = -1;
       x -= diff; 
     }
-    else if(x < 0)
+    else if(left < 0)
     {
-      diff = 0 - x;
+      diff = 0 - left;
       rball.vx = 1;
       x += diff; 
+    }
+    else if(bottom > canvas.height)
+    {
+      diff = bottom - canvas.height;
+      rball.vy = -1;
+      y -= diff;
+    }
+    else if(top < 0)
+    {
+      diff = 0 - top;
+      rball.vy = 1;
+      y += diff;
     }
     else if(window.cbr[i-1])
     {
       rball.vx *= -1;
+      rball.vy *= -1;
       x = rball.x + rball.vx * rball.sp;
+      y = rball.y + rball.vy * rball.sp;
     }
     rball.x = x;
     rball.y = y;
@@ -195,46 +212,51 @@ canvas.addEventListener("mousemove",mousemoveHandle, false);
 
 //Center it on the canvas and push it into the sprites array
 var r1 = Object.create(sprite);
-r1.x = 0;
+r1.x = 50;
 r1.y = 20;
 r1.w = 20;
 r1.h = 20;
 r1.srcW = 400;
 r1.srcH = 400;
 r1.vx = 1;
+r1.vy = -1;
+r1.sp = 0.5;
 sprites.push(r1);
 
 var r2 = Object.create(sprite);
-r2.x = 0;
+r2.x = 100;
 r2.y = 60;
 r2.w = 20;
 r2.h = 20;
 r2.srcW = 400;
 r2.srcH = 400;
 r2.vx = -1;
-r2.sp = 2;
+r2.vy = 1;
+r2.sp = 0.2;
 sprites.push(r2);
 
 var r3 = Object.create(sprite);
-r3.x = 0;
+r3.x = 150;
 r3.y = 100;
 r3.w = 20;
 r3.h = 20;
 r3.srcW = 400;
 r3.srcH = 400;
 r3.vx = 1;
-r3.sp = 1.5;
+r3.vy = 1;
+r3.sp = 0.5;
 sprites.push(r3);
 
 var r4 = Object.create(sprite);
-r4.x = 0;
+r4.x = 200;
 r4.y = 140;
 r4.w = 20;
 r4.h = 20;
 r4.srcW = 400;
 r4.srcH = 400;
 r4.vx = -1;
-r4.sp = 3
+r4.vy = -1;
+r4.sp = 0.3;
 sprites.push(r4);
 
 //Load the sprite image
