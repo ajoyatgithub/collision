@@ -22,108 +22,36 @@ function collision()
       window.cbr[i-1] = false;
     }
   }
-  
-  
-
 }
 
 function moveRed()
 {
-  //Instructions for red ball 1
-  x = r1.x + r1.vx * r1.sp;
-  y = r1.y + r1.vy * r1.sp;
-  right = r1.w + x;
-  if(right > canvas.width)
+  for(i =1; i<5; i++)
   {
-    diff = right - canvas.width;
-    r1.vx = -1;
-    x -= diff; 
+    rball = sprites[i];
+    x = rball.x + rball.vx * rball.sp;
+    y = rball.y + rball.vy * rball.sp;
+    right = rball.w + x;
+    if(right > canvas.width)
+    {
+      diff = right - canvas.width;
+      rball.vx = -1;
+      x -= diff; 
+    }
+    else if(x < 0)
+    {
+      diff = 0 - x;
+      rball.vx = 1;
+      x += diff; 
+    }
+    else if(window.cbr[i-1])
+    {
+      rball.vx *= -1;
+      x = rball.x + rball.vx * rball.sp;
+    }
+    rball.x = x;
+    rball.y = y;
   }
-  else if(x < 0)
-  {
-    diff = 0 - x;
-    r1.vx = 1;
-    x += diff; 
-  }
-  else if(window.cbr[0])
-  {
-    r1.vx *= -1;
-    x = r1.x + r1.vx * r1.sp;
-  }
-  r1.x = x;
-  r1.y = y;
-  
-  //Instructions for red ball 2
-  x = r2.x + r2.vx * r2.sp;
-  y = r2.y + r2.vy * r2.sp;
-  right = r2.w + x;
-  if(right > canvas.width)
-  {
-    diff = right - canvas.width;
-    r2.vx = -1;
-    x -= diff; 
-  }
-  else if(x < 0)
-  {
-    diff = 0 - x;
-    r2.vx = 1;
-    x += diff; 
-  }
-  else if(window.cbr[1])
-  {
-    r2.vx *= -1;
-    x = r2.x + r2.vx * r2.sp;
-  }
-  r2.x = x;
-  r2.y = y;
-  
-  //Instructions for red ball 3
-  x = r3.x + r3.vx * r3.sp;
-  y = r3.y + r3.vy * r3.sp;
-  right = r3.w + x;
-  if(right > canvas.width)
-  {
-    diff = right - canvas.width;
-    r3.vx = -1;
-    x -= diff; 
-  }
-  else if(x < 0)
-  {
-    diff = 0 - x;
-    r3.vx = 1;
-    x += diff; 
-  }
-  else if(window.cbr[2])
-  {
-    r3.vx *= -1;
-    x = r3.x + r3.vx * r3.sp;
-  }
-  r3.x = x;
-  r3.y = y;
-  
-  //Instructions for red ball 4
-  x = r4.x + r4.vx * r4.sp;
-  y = r4.y + r4.vy * r4.sp;
-  right = r4.w + x;
-  if(right > canvas.width)
-  {
-    diff = right - canvas.width;
-    r4.vx = -1;
-    x -= diff; 
-  }
-  else if(x < 0)
-  {
-    diff = 0 - x;
-    r4.vx = 1;
-    x += diff; 
-  }
-  else if(window.cbr[3])
-  {
-    r4.vx *= -1;
-    x = r4.x + r4.vx * r4.sp;
-  }
-  r4.x = x;
-  r4.y = y;
 }
 
 function update() 
@@ -133,8 +61,6 @@ function update()
   moveRed();
   window.requestAnimationFrame(update, canvas); 
   render();
-  distdiv = document.getElementById("dtag");
-  distdiv.innerHTML = "Blue(" + bluecx + "," + bluecy + ") Distance is : " + dist;
 } 
 
 function render() 
@@ -146,66 +72,32 @@ function render()
   { 
     for(var i = 0; i < sprites.length; i++) 
     { 
-      switch(i)
+      if(i==0)
       {
-        case 0:
-          var sprite = sprites[i]; 
-          surface.drawImage 
-          ( 
-            imgBlueBall, 
-            sprite.srcX, sprite.srcY, 
-            sprite.srcW, sprite.srcH, 
-            Math.floor(sprite.x), Math.floor(sprite.y), 
-            sprite.w, sprite.h 
-          );
-          break;
-        case 1:
-          var sprite = sprites[i]; 
-          surface.drawImage 
-          ( 
-              imgRedBall, 
-              sprite.srcX, sprite.srcY, 
-              sprite.srcW, sprite.srcH, 
-              Math.floor(sprite.x), Math.floor(sprite.y), 
-              sprite.w, sprite.h 
+        var sprite = sprites[i]; 
+        surface.drawImage 
+        ( 
+          imgBlueBall, 
+          sprite.srcX, sprite.srcY, 
+          sprite.srcW, sprite.srcH, 
+          Math.floor(sprite.x), Math.floor(sprite.y), 
+          sprite.w, sprite.h 
         );
-        break;
-        case 2:
-          var sprite = sprites[i]; 
-          surface.drawImage 
-          ( 
-              imgRedBall, 
-              sprite.srcX, sprite.srcY, 
-              sprite.srcW, sprite.srcH, 
-              Math.floor(sprite.x), Math.floor(sprite.y), 
-              sprite.w, sprite.h 
-        );
-        break;
-        case 3:
-          var sprite = sprites[i]; 
-          surface.drawImage 
-          ( 
-              imgRedBall, 
-              sprite.srcX, sprite.srcY, 
-              sprite.srcW, sprite.srcH, 
-              Math.floor(sprite.x), Math.floor(sprite.y), 
-              sprite.w, sprite.h 
-        );
-        break;
-        case 4:
-          var sprite = sprites[i]; 
-          surface.drawImage 
-          ( 
-              imgRedBall, 
-              sprite.srcX, sprite.srcY, 
-              sprite.srcW, sprite.srcH, 
-              Math.floor(sprite.x), Math.floor(sprite.y), 
-              sprite.w, sprite.h 
-        );
-        break;
       }
+      else
+      {
+        var sprite = sprites[i]; 
+        surface.drawImage 
+        ( 
+          imgRedBall, 
+          sprite.srcX, sprite.srcY, 
+          sprite.srcW, sprite.srcH, 
+          Math.floor(sprite.x), Math.floor(sprite.y), 
+          sprite.w, sprite.h 
+        );
+      } 
     } 
-  } 
+  }
 }
 
 function move(mousex, mousey)
