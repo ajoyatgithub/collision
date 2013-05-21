@@ -10,8 +10,6 @@ function collision()
   redcx = objRedBall.cx();
   redcy = objRedBall.cy();
   dist = Math.sqrt(square((redcx - bluecx)) + square((redcy - bluecy)));
-  distdiv = document.getElementById("dtag");
-  distdiv.innerHTML = "Blue(" + bluecx + "," + bluecy + ") Red(" + redcx + "," + redcy + ") Distance is : " + dist;
   if(dist <= 20)
   {
     window.collBR = true;
@@ -26,25 +24,37 @@ function collision()
 
 function moveRed()
 {
-  if(objRedBall.right() >= canvas.width)
+  
+  x = objRedBall.x + objRedBall.vx * objRedBall.sp;
+  y = objRedBall.y + objRedBall.vy * objRedBall.sp;
+  right = objRedBall.w + x;
+  if(right > canvas.width)
   {
-    objRedBall.x = 0;
+    diff = right - canvas.width;
+    objRedBall.vx = -1;
+    x -= diff; 
   }
-  else
+  else if(x < 0)
   {
-    if(!window.collBR)
-    {
-      objRedBall.x += 1;
-    }
+    diff = 0 - x;
+    objRedBall.vx = 1;
+    x += diff; 
   }
+  else if(window.collBR)
+  {
+    objRedBall.vx *= -1;
+    x = objRedBall.x + objRedBall.vx * objRedBall.sp;
+  }
+  objRedBall.x = x;
+  objRedBall.y = y;
 }
 
 function update() 
 { 
   //Create the animation loop
-  window.requestAnimationFrame(update, canvas); 
   collision();
   moveRed();
+  window.requestAnimationFrame(update, canvas); 
   render(); 
 } 
 
@@ -99,6 +109,8 @@ function mousemoveHandle(event)
   mouseX = event.pageX - canvas.offsetLeft;
   mouseY = event.pageY - canvas.offsetTop;
   move(mouseX, mouseY);
+  distdiv = document.getElementById("dtag");
+  distdiv.innerHTML = "Blue(" + bluecx + "," + bluecy + ") Red(" + redcx + "," + redcy + ") Distance is : " + dist;
 }
 
 function loadImage() 
@@ -111,7 +123,6 @@ window.collBR = false;
 canvas = document.getElementById("cv");
 canvas.style.cursor = "none";
 surface = canvas.getContext("2d");
-canvas.addEventListener("mousemove",mousemoveHandle, false);
 //--- The sprite object
 
 var sprite = 
@@ -126,6 +137,12 @@ var sprite =
   y: 0, 
   w: 10, 
   h: 10,
+  
+  //Direction Vectors
+  vx: 0,
+  vy: 0,
+  //Magnitude
+  sp: 1,
   //Getters
   cx: function()
   {
@@ -164,6 +181,7 @@ objRedBall.w = 20;
 objRedBall.h = 20;
 objRedBall.srcW = 400;
 objRedBall.srcH = 400;
+objRedBall.vx = 1;
 sprites.push(objRedBall);
 
 //Load the sprite image
@@ -183,3 +201,5 @@ sprites.push(objBlueBall);
 var imgBlueBall = new Image();
 imgBlueBall.addEventListener("load", loadImage, false);
 imgBlueBall.src = "../images/blue.png";
+
+canvas.addEventListener("mousemove",mousemoveHandle, false);
