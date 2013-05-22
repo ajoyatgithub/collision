@@ -13,13 +13,36 @@ function collision()
     rcx = rball.cx();
     rcy = rball.cy();
     dist = Math.sqrt(square((rcx - bluecx)) + square((rcy - bluecy)));
-    if(dist <= 20)
+    if(dist <= rball.w)
     {
       window.cbr[i-1] = true;
     }
     else
     {
       window.cbr[i-1] = false;
+    }
+  }
+  window.count = 0;
+  for(i=1;i<4;i++)
+  {
+    for(j=i+1;j<5;j++)
+    {
+      ri = sprites[i];
+      rj = sprites[j];
+      ricx = ri.cx();
+      ricy = ri.cy();
+      rjcx = rj.cx();
+      rjcy = rj.cy();
+      dist = Math.sqrt(square((ricx - rjcx)) + square((ricy - rjcy)));
+      if(dist <= ri.w)
+      {
+        window.crr[window.count] = true;
+      }
+      else
+      {
+        window.crr[window.count] = false;
+      }
+      window.count++;
     }
   }
 }
@@ -33,7 +56,7 @@ function moveRed()
     y = rball.y + rball.vy * rball.sp;
     right = rball.w + x;
     left = x;
-    top = y;
+    ytop = y;
     bottom = y + rball.h;
     if(right > canvas.width)
     {
@@ -53,11 +76,11 @@ function moveRed()
       rball.vy = -1;
       y -= diff;
     }
-    else if(top < 0)
+    else if(ytop < 0)
     {
-      diff = 0 - top;
+      diff = 0 - ytop;
       rball.vy = 1;
-      y += diff;
+      y += diff; 
     }
     else if(window.cbr[i-1])
     {
@@ -136,11 +159,34 @@ function loadImage()
   update(); 
 }
 
+//Array to check collision of blue red
 window.cbr = new Array(4);
-window.cbr[0] = false;
-window.cbr[1] = false;
-window.cbr[2] = false;
-window.cbr[3] = false;
+for(i in window.cbr)
+{
+  window.cbr[i] = false;
+}
+
+//Array for collision of red with red
+window.crr = new Array(6);
+for(i in window.crr)
+{
+  window.crr[i] = false;
+}
+/*
+crr[0] = collision 1 & 2
+crr[1] = collision 1 & 3
+crr[2] = collision 1 & 4
+crr[3] = collision 2 & 3
+crr[4] = collision 2 & 4
+crr[5] = collision 3 & 4
+
+Collision is checked in loop
+12 13 14
+23 24
+34
+
+
+*/
 
 canvas = document.getElementById("cv");
 canvas.style.cursor = "none";
@@ -198,8 +244,8 @@ var sprites = [];
 var objBlueBall = Object.create(sprite);
 objBlueBall.x = 100;
 objBlueBall.y = 0;
-objBlueBall.w = 20;
-objBlueBall.h = 20;
+objBlueBall.w = 25;
+objBlueBall.h = 25;
 objBlueBall.srcW = 400;
 objBlueBall.srcH = 400;
 sprites.push(objBlueBall);
@@ -213,50 +259,50 @@ canvas.addEventListener("mousemove",mousemoveHandle, false);
 //Center it on the canvas and push it into the sprites array
 var r1 = Object.create(sprite);
 r1.x = 50;
-r1.y = 20;
-r1.w = 20;
-r1.h = 20;
+r1.y = 250;
+r1.w = 25;
+r1.h = 25;
 r1.srcW = 400;
 r1.srcH = 400;
 r1.vx = 1;
 r1.vy = -1;
-r1.sp = 0.5;
+r1.sp = 1.7;
 sprites.push(r1);
 
 var r2 = Object.create(sprite);
 r2.x = 100;
 r2.y = 60;
-r2.w = 20;
-r2.h = 20;
+r2.w = 25;
+r2.h = 25;
 r2.srcW = 400;
 r2.srcH = 400;
 r2.vx = -1;
 r2.vy = 1;
-r2.sp = 0.2;
+r2.sp = 1.2;
 sprites.push(r2);
 
 var r3 = Object.create(sprite);
 r3.x = 150;
-r3.y = 100;
-r3.w = 20;
-r3.h = 20;
+r3.y = 300;
+r3.w = 25;
+r3.h = 25;
 r3.srcW = 400;
 r3.srcH = 400;
 r3.vx = 1;
 r3.vy = 1;
-r3.sp = 0.5;
+r3.sp = 1.8;
 sprites.push(r3);
 
 var r4 = Object.create(sprite);
 r4.x = 200;
-r4.y = 140;
-r4.w = 20;
-r4.h = 20;
+r4.y = 440;
+r4.w = 25;
+r4.h = 25;
 r4.srcW = 400;
 r4.srcH = 400;
 r4.vx = -1;
 r4.vy = -1;
-r4.sp = 0.3;
+r4.sp = 1.5;
 sprites.push(r4);
 
 //Load the sprite image
