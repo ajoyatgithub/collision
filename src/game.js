@@ -61,37 +61,148 @@ function moveRed()
     if(right > canvas.width)
     {
       diff = right - canvas.width;
-      rball.vx = -1;
+      rball.vx *= -1;
       x -= diff; 
     }
     else if(left < 0)
     {
       diff = 0 - left;
-      rball.vx = 1;
+      rball.vx *= -1;
       x += diff; 
     }
     else if(bottom > canvas.height)
     {
       diff = bottom - canvas.height;
-      rball.vy = -1;
+      rball.vy *= -1;
       y -= diff;
     }
     else if(ytop < 0)
     {
       diff = 0 - ytop;
-      rball.vy = 1;
+      rball.vy *= -1;
       y += diff; 
     }
     else if(window.cbr[i-1])
     {
-      rball.vx *= -1;
-      rball.vy *= -1;
+      for(i in sprites)
+      {
+        sprites[i].vx *= 0;
+        sprites[i].vy *= 0;
+      }
       x = rball.x + rball.vx * rball.sp;
       y = rball.y + rball.vy * rball.sp;
+    }
+    /*
+     * crr[0] = collision 1 & 2
+     * crr[1] = collision 1 & 3
+     * crr[2] = collision 1 & 4
+     * crr[3] = collision 2 & 3
+     * crr[4] = collision 2 & 4
+     * crr[5] = collision 3 & 4
+    */
+    if(window.crr[0])
+    {
+      bounce(1, 2);
+    }
+    else if(window.crr[1])
+    {
+      bounce(1, 3);
+    }
+    else if(window.crr[2])
+    {
+      bounce(1, 4);
+    }
+    else if(window.crr[3])
+    {
+      bounce(2, 3);
+    }
+    else if(window.crr[4])
+    {
+      bounce(2, 4);
+    }
+    else if(window.crr[5])
+    {
+      bounce(3, 4);
     }
     rball.x = x;
     rball.y = y;
   }
+}
+var logmessage = "";
+var temp1 = "";
+var ctr = 0;
+
+function log_redballs()
+{
+  logdiv =document.getElementById("rbstat");
+  logdiv.innerHTML = "";
+  var logstr = "";
+  for(i=1;i<5;i++)
+  {
+    logstr = "Ball " + i + " (" + sprites[i].x + "," + sprites[i].y + ") : vx : " + sprites[i].vx + "; vy : " + sprites[i].vy + "</br>";
+    logdiv.innerHTML += logstr;
+  }
+}
+
+function page_log(msg)
+{
+  if(msg != logmessage && msg != temp1)
+  {
+    div_log = document.getElementById("pagelog");
+    if(ctr>50)
+    {
+      return;
+    }
+    div_log.innerHTML += msg;
+    temp1 = logmessage;
+    logmessage = msg;
+    ctr++;
+  }
+}
+
+function bounce(i, j)
+{
+  b1 = sprites[i];
+  b2 = sprites[j];
+  mesg = "B1 is " + b1.vx + ", " + b1.vy + " and B2 is " + b2.vx + ", " + b2.vy;
+  if(b1.vx != b2.vx && b1.vy == b2.vy)
+  {
+    b1.vx *= -1;
+    b2.vx *= -1;
+    mesg += " Case 1 </br>";
+  }
+  else if(b1.vy != b2.vy && b1.vx == b2.vx)
+  {
+    b1.vy *= -1;
+    b2.vy *= -1;
+    mesg += "Case 2 </br>";
+  }
+  else if(b1.vx == b1.vy && b2.vx == b2.vy || b1.vx != b1.vy && b2.vx != b2.vy)
+  {
+    b1.vx *= -1;
+    b1.vy *= -1;
+    b2.vx *= -1;
+    b2.vy *= -1;
+    mesg += "Case 3 </br>";
+  }
+  else
+  {
+    b1.vx *= -1;
+    b1.vy *= -1;
+    b2.vx *= -1;
+    b2.vy *= -1;
+    mesg += "Case else </br>";
+  }
+  page_log(mesg);
+  /*
+   * vx1 != vx2 && vy1 == vy2 ==>> x * -1
+   * 
+   * 
+  */
+  //b1.vx *= -1;
+  //b1.vy *= -1;
+  //b2.vx *= -1;
+  //b2.vy *= -1;
 }
 
 function update() 
@@ -103,8 +214,9 @@ function update()
   render();
 } 
 
-function render() 
+function render()
 { 
+  log_redballs();
   //Clear the previous animation frame
   surface.clearRect(0, 0, canvas.width, canvas.height);
   //Loop through all the sprites in the "sprites" array and use their properties to display them
@@ -264,9 +376,9 @@ r1.w = 25;
 r1.h = 25;
 r1.srcW = 400;
 r1.srcH = 400;
-r1.vx = 1;
-r1.vy = -1;
-r1.sp = 1.7;
+r1.vx = -1;
+r1.vy = -2;
+r1.sp = 1;
 sprites.push(r1);
 
 var r2 = Object.create(sprite);
@@ -276,9 +388,9 @@ r2.w = 25;
 r2.h = 25;
 r2.srcW = 400;
 r2.srcH = 400;
-r2.vx = -1;
-r2.vy = 1;
-r2.sp = 1.2;
+r2.vx = 3;
+r2.vy = -2;
+r2.sp = 1;
 sprites.push(r2);
 
 var r3 = Object.create(sprite);
@@ -288,21 +400,21 @@ r3.w = 25;
 r3.h = 25;
 r3.srcW = 400;
 r3.srcH = 400;
-r3.vx = 1;
-r3.vy = 1;
-r3.sp = 1.8;
+r3.vx = -1;
+r3.vy = 2;
+r3.sp = 1;
 sprites.push(r3);
 
 var r4 = Object.create(sprite);
 r4.x = 200;
-r4.y = 440;
+r4.y = 340;
 r4.w = 25;
 r4.h = 25;
 r4.srcW = 400;
 r4.srcH = 400;
-r4.vx = -1;
+r4.vx = 2;
 r4.vy = -1;
-r4.sp = 1.5;
+r4.sp = 1;
 sprites.push(r4);
 
 //Load the sprite image
