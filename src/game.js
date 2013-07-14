@@ -12,8 +12,8 @@ function collision()
     rball = sprites[i];
     rcx = rball.cx();
     rcy = rball.cy();
-    dist = Math.sqrt(square((rcx - bluecx)) + square((rcy - bluecy)));
-    if(dist <= rball.w)
+    dist = square((rcx - bluecx)) + square((rcy - bluecy));
+    if(dist <= 625)
     {
       window.cbr[i-1] = true;
     }
@@ -33,8 +33,8 @@ function collision()
       ricy = ri.cy();
       rjcx = rj.cx();
       rjcy = rj.cy();
-      dist = Math.sqrt(square((ricx - rjcx)) + square((ricy - rjcy)));
-      if(dist <= ri.w)
+      dist = square((ricx - rjcx)) + square((ricy - rjcy));
+      if(dist <= 625)
       {
         window.crr[window.count] = true;
       }
@@ -124,8 +124,8 @@ function moveRed()
     {
       bounce(3, 4);
     }
-    rball.x = x;
-    rball.y = y;
+    rball.setx(x);
+    rball.sety(y);
   }
 }
 var logmessage = "";
@@ -254,8 +254,8 @@ function render()
 
 function move(mousex, mousey)
 {
-  objBlueBall.x = mousex - objBlueBall.w/2;
-  objBlueBall.y = mousey - objBlueBall.h/2;
+  objBlueBall.setx(mousex - objBlueBall.w/2);
+  objBlueBall.sety(mousey - objBlueBall.h/2);
 }
 
 function mousemoveHandle(event)
@@ -318,6 +318,9 @@ var sprite =
   w: 10, 
   h: 10,
   
+  //The old values of x & y
+  oldx: 0,
+  oldy: 0,
   //Direction Vectors
   vx: 0,
   vy: 0,
@@ -347,6 +350,17 @@ var sprite =
   bottom: function()
   {
     return this.y + this.h;
+  },
+  //Setters
+  setx: function(valx)
+  {
+    this.oldx = this.x;
+    this.x = valx;
+  },
+  sety: function(valy)
+  {
+    this.oldy = this.y;
+    this.y = valy;
   }
 }; 
 //An array to store the game sprites
@@ -370,49 +384,57 @@ canvas.addEventListener("mousemove",mousemoveHandle, false);
 
 //Center it on the canvas and push it into the sprites array
 var r1 = Object.create(sprite);
-r1.x = 50;
-r1.y = 250;
+var redxrand = Math.random() * 200;
+var redyrand = Math.random() * 200;
+r1.x = redxrand;
+r1.y = redyrand;
 r1.w = 25;
 r1.h = 25;
 r1.srcW = 400;
 r1.srcH = 400;
 r1.vx = -1;
-r1.vy = -2;
+r1.vy = -1;
 r1.sp = 1;
 sprites.push(r1);
 
 var r2 = Object.create(sprite);
-r2.x = 100;
-r2.y = 60;
+redxrand = Math.random() * 200 + 200;
+redyrand = Math.random() * 200;
+r2.x = redxrand;
+r2.y = redyrand;
 r2.w = 25;
 r2.h = 25;
 r2.srcW = 400;
 r2.srcH = 400;
-r2.vx = 3;
-r2.vy = -2;
+r2.vx = 1;
+r2.vy = -1;
 r2.sp = 1;
 sprites.push(r2);
 
 var r3 = Object.create(sprite);
-r3.x = 150;
-r3.y = 300;
+redxrand = Math.random() * 200;
+redyrand = Math.random() * 200 + 200;
+r3.x = redxrand;
+r3.y = redyrand;
 r3.w = 25;
 r3.h = 25;
 r3.srcW = 400;
 r3.srcH = 400;
 r3.vx = -1;
-r3.vy = 2;
+r3.vy = 1;
 r3.sp = 1;
 sprites.push(r3);
 
 var r4 = Object.create(sprite);
-r4.x = 200;
-r4.y = 340;
+redxrand = Math.random() * 200 + 200;
+redyrand = Math.random() * 200 + 200;
+r4.x = redxrand;
+r4.y = redyrand;
 r4.w = 25;
 r4.h = 25;
 r4.srcW = 400;
 r4.srcH = 400;
-r4.vx = 2;
+r4.vx = 1;
 r4.vy = -1;
 r4.sp = 1;
 sprites.push(r4);
