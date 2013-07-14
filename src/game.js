@@ -37,6 +37,7 @@ function collision()
       if(dist <= 625)
       {
         window.crr[window.count] = true;
+        moveback(i, j, 625 - dist);
       }
       else
       {
@@ -45,6 +46,20 @@ function collision()
       window.count++;
     }
   }
+}
+
+function moveback(i, j, dist)
+{
+  if(dist == 0)
+  {
+    return;
+  }
+  ball_a = sprites[i];
+  ball_b = sprites[j];
+  d = Math.sqrt(dist) / 2;
+  
+  var x1 = ball_a.x;
+  
 }
 
 function moveRed()
@@ -354,13 +369,13 @@ var sprite =
   //Setters
   setx: function(valx)
   {
-    this.oldx = this.x;
-    this.x = valx;
+    this.oldx = this.cx();
+    this.x = valx - (this.w/2);
   },
   sety: function(valy)
   {
-    this.oldy = this.y;
-    this.y = valy;
+    this.oldy = this.cy();
+    this.y = valy - (this.h/2);
   }
 }; 
 //An array to store the game sprites
@@ -386,8 +401,8 @@ canvas.addEventListener("mousemove",mousemoveHandle, false);
 var r1 = Object.create(sprite);
 var redxrand = Math.random() * 200;
 var redyrand = Math.random() * 200;
-r1.x = redxrand;
-r1.y = redyrand;
+r1.setx(redxrand);
+r1.sety(redyrand);
 r1.w = 25;
 r1.h = 25;
 r1.srcW = 400;
@@ -400,8 +415,8 @@ sprites.push(r1);
 var r2 = Object.create(sprite);
 redxrand = Math.random() * 200 + 200;
 redyrand = Math.random() * 200;
-r2.x = redxrand;
-r2.y = redyrand;
+r2.setx(redxrand);
+r2.sety(redyrand);
 r2.w = 25;
 r2.h = 25;
 r2.srcW = 400;
@@ -414,8 +429,8 @@ sprites.push(r2);
 var r3 = Object.create(sprite);
 redxrand = Math.random() * 200;
 redyrand = Math.random() * 200 + 200;
-r3.x = redxrand;
-r3.y = redyrand;
+r3.setx(redxrand);
+r3.sety(redyrand);
 r3.w = 25;
 r3.h = 25;
 r3.srcW = 400;
@@ -428,8 +443,8 @@ sprites.push(r3);
 var r4 = Object.create(sprite);
 redxrand = Math.random() * 200 + 200;
 redyrand = Math.random() * 200 + 200;
-r4.x = redxrand;
-r4.y = redyrand;
+r4.setx(redxrand);
+r4.sety(redyrand);
 r4.w = 25;
 r4.h = 25;
 r4.srcW = 400;
