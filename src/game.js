@@ -37,7 +37,6 @@ function collision()
       if(dist <= 625)
       {
         window.crr[window.count] = true;
-        moveback(i, j, 625 - dist);
       }
       else
       {
@@ -48,18 +47,48 @@ function collision()
   }
 }
 
-function moveback(i, j, dist)
+function moveback(i, j)
 {
+  ball_a = sprites[i];
+  ball_b = sprites[j];
+  var x1 = ball_a.cx();
+  var y1 = ball_a.cy();
+  var x2 = ball_b.cx();
+  var y2 = ball_b.cy();
+  var dist = square(x2 - x1) + square(y2 - y1);
   if(dist == 0)
   {
     return;
   }
-  ball_a = sprites[i];
-  ball_b = sprites[j];
-  d = Math.sqrt(dist) / 2;
-  
-  var x1 = ball_a.x;
-  
+  var r = Math.sqrt(dist);
+  r = (25 - r) / 2;
+  var A = y1 - y2;
+  var B = x2 - x1;
+  var C = x1*y2 - x2*y1;
+  var h = x1;
+  var k = y1;
+  var temp = Math.sqrt(square(A) + square(B)); //   (A^2 + B^2)^1/2
+  var a = A  / temp;
+  var b = B / temp;
+  var d = (A*h + B*k + C) / temp;
+  temp = Math.sqrt(square(r) - square(d));          //    (r ^2 - d ^2)^1/2
+  var x_a = h - a*d + b*temp;
+  var x_b = h - a*d - b*temp;
+  var y_a = k - b*d + a*temp;
+  var y_b = k - b*d - a*temp;
+  /*
+   * (x,y)----------------(x1,y1)------------------(x2,y2)
+   * dist((x,y) (x1,y1)) + dist((x1,y1) (x2,y2)) = dist((x,y) (x2,y2))
+   *
+   * (x - x1)^2 + (y - y1)^2 + dist = (x - x2)^2 + (y - y2)^2
+   * 
+   */
+  var temp1 = square(x_a - x2) + square(y_a - y2);
+  temp = square(x_a - x1) + square(y_a - y1) + dist;
+  if(temp == temp1)
+  {
+    
+  }
 }
 
 function moveRed()
@@ -67,12 +96,12 @@ function moveRed()
   for(i =1; i<5; i++)
   {
     rball = sprites[i];
-    x = rball.x + rball.vx * rball.sp;
-    y = rball.y + rball.vy * rball.sp;
-    right = rball.w + x;
-    left = x;
-    ytop = y;
-    bottom = y + rball.h;
+    x = rball.cx() + rball.vx * rball.sp;
+    y = rball.cy() + rball.vy * rball.sp;
+    right = (rball.w / 2) + x;
+    left = x - (rball.w / 2);
+    ytop = y - (rball.h / 2);
+    bottom = y + (rball.h / 2);
     if(right > canvas.width)
     {
       diff = right - canvas.width;
@@ -104,8 +133,8 @@ function moveRed()
         sprites[i].vx *= 0;
         sprites[i].vy *= 0;
       }
-      x = rball.x + rball.vx * rball.sp;
-      y = rball.y + rball.vy * rball.sp;
+      x = rball.cx() + rball.vx * rball.sp;
+      y = rball.cy() + rball.vy * rball.sp;
     }
     /*
      * crr[0] = collision 1 & 2
@@ -154,7 +183,7 @@ function log_redballs()
   var logstr = "";
   for(i=1;i<5;i++)
   {
-    logstr = "Ball " + i + " (" + sprites[i].x + "," + sprites[i].y + ") : vx : " + sprites[i].vx + "; vy : " + sprites[i].vy + "</br>";
+    logstr = "Ball " + i + " : vx : " + sprites[i].vx + "; vy : " + sprites[i].vy + " (" + sprites[i].cx() + "," + sprites[i].cy() + ")</br>";
     logdiv.innerHTML += logstr;
   }
 }
@@ -208,6 +237,7 @@ function bounce(i, j)
     b2.vy *= -1;
     mesg += "Case else </br>";
   }
+  moveback(i, j);
   page_log(mesg);
   /*
    * vx1 != vx2 && vy1 == vy2 ==>> x * -1
@@ -221,7 +251,7 @@ function bounce(i, j)
 }
 
 function update() 
-{ 
+{
   //Create the animation loop
   collision();
   moveRed();
@@ -281,7 +311,7 @@ function mousemoveHandle(event)
 }
 
 function loadImage() 
-{ 
+{
   //Update the sprite as soon as the image has been loaded
   update(); 
 }
@@ -370,12 +400,12 @@ var sprite =
   setx: function(valx)
   {
     this.oldx = this.cx();
-    this.x = valx - (this.w/2);
+    this.x = valx - (this.w / 2);
   },
   sety: function(valy)
   {
     this.oldy = this.cy();
-    this.y = valy - (this.h/2);
+    this.y = valy - (this.h / 2);
   }
 }; 
 //An array to store the game sprites
@@ -409,7 +439,7 @@ r1.srcW = 400;
 r1.srcH = 400;
 r1.vx = -1;
 r1.vy = -1;
-r1.sp = 1;
+//r1.sp = 0.1;
 sprites.push(r1);
 
 var r2 = Object.create(sprite);
@@ -423,7 +453,7 @@ r2.srcW = 400;
 r2.srcH = 400;
 r2.vx = 1;
 r2.vy = -1;
-r2.sp = 1;
+//r2.sp = 0.1;
 sprites.push(r2);
 
 var r3 = Object.create(sprite);
@@ -437,7 +467,7 @@ r3.srcW = 400;
 r3.srcH = 400;
 r3.vx = -1;
 r3.vy = 1;
-r3.sp = 1;
+//r3.sp = 0.1;
 sprites.push(r3);
 
 var r4 = Object.create(sprite);
@@ -451,7 +481,7 @@ r4.srcW = 400;
 r4.srcH = 400;
 r4.vx = 1;
 r4.vy = -1;
-r4.sp = 1;
+//r4.sp = 0.1;
 sprites.push(r4);
 
 //Load the sprite image
