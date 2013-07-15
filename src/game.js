@@ -47,6 +47,115 @@ function collision()
   }
 }
 
+function circle_line_intersect(x1, y1, x2, y2)
+{
+  /*
+   * Two balls at (x1 y1) and (x2 y2)
+   * 
+   * dist^2 = (x1 - x2)^2 + (y1 - y2)^2
+   * 
+   * General equation of line through them : 
+   *            (2x1 - 2x2)x + (2y1 - 2y2)y + (x2^2 + y2^2 - x1^2 - y1^2 - dist) = 0
+   *                    Ax        +         By        +                        C                          = 0
+   *
+   * h = x1 & k = y1
+   * 
+   * line Ax + By + C = 0 cuts circle with center at (h,k)  and radius r = (25 - dist) / 2
+   * at (x_a, y_a) or (x_b, y_b)
+   * 
+   * where,  r is the distance from point h, k to the required point (x, y)
+   * 
+   * (x,y)----------------(h, k)------------------(x2,y2)
+   * 
+   * |<-----------r----------->|<---------dist---------->|
+   * |<--------------------------------------------------->|
+   * 
+   * Above relation can be used to determine the correct point
+   */
+  
+  var dist = Math.sqrt(square(x1 - x2) + square(y1 - y2));
+  
+  var A = 2*x1 - 2*x2;
+  var B = 2*y1 - 2*y2;
+  var C = x2^2 + y2^2 - x1^2 - y1^2 - dist;
+  
+  var h = x1;
+  var k = y1;
+  
+  var r = (25 - dist) / 2;
+  
+  var sqrtAB = Math.sqrt(square(A) + square(B)); //   (A^2 + B^2)^1/2
+  var a = A  / sqrtAB;
+  var b = B / sqrtAB;
+  var d = (A*h + B*k + C) / sqrtAB;
+  var sqrtRD = Math.sqrt(square(r) - square(d));          //    (r ^2 - d ^2)^1/2
+  var x_a = h - a*d + b*sqrtRD;
+  var x_b = h - a*d - b*sqrtRD;
+  var y_a = k - b*d + a*sqrtRD;
+  var y_b = k - b*d - a*sqrtRD; 
+  /*
+   * (x,y)----------------(x1,y1)------------------(x2,y2)
+   * dist((x,y) (x1,y1)) + dist((x1,y1) (x2,y2)) = dist((x,y) (x2,y2))
+   *
+   *    _________________                 _________________
+   * V (x - x1)^2 + (y - y1)^2 + dist = V(x - x2)^2 + (y - y2)^2
+   * 
+   */
+  
+  var c1x, c1y, c2x, c2y;
+  
+  var temp = Math.sqrt(square(x_a - x2) + square(y_a - y2));
+  var temp1 = Math.sqrt(square(x_a - x1) + square(y_a - y1)) + dist;
+  if(temp == temp1)
+  {
+    c1x = x_a;
+    c1y = y_a;
+  }
+  else
+  {
+    c1x = x_b;
+    c1y = y_b;
+  }
+  /*
+   * Points for first circle are thus c1x, c1y
+   *
+   * 
+   * For second circle
+   * 
+   * (x1, y1)------------------(h, k)----------------------(x, y)
+   *                                 (x2,y2)
+   * 
+   * |<-----------dist------------>|<------------r-------------->|
+   * |<----------------------------------------------------------->|
+   * 
+   * dist((x1,y1) (h, k)) + dist((h, k) (x,y)) = dist((x1,y1) (x,y))
+   *
+   * dist + (x2 - x_a)^2 + (y2 - y_a)^2 = (x1 - x_a)^2 + (y1 - y_a)^2
+   * 
+   */
+  
+  h = x2;
+  k = y2;
+  x_a = h - a*d + b*sqrtRD;
+  x_b = h - a*d - b*sqrtRD;
+  y_a = k - b*d + a*sqrtRD;
+  y_b = k - b*d - a*sqrtRD;
+
+  temp = Math.sqrt(square(x_a - x1) + square(y_a - y1));
+  temp1 = Math.sqrt(square(x_a - x2) + square(y_a - y2)) + dist;
+  if(temp == temp1)
+  {
+    c2x = x_a;
+    c2y = y_a;
+  }
+  else
+  {
+    c2x = x_b;
+    c2y = y_b;
+  }
+  return [c1x, c1y, c2x, c2y];
+}
+
 function moveback(i, j)
 {
   ball_a = sprites[i];
@@ -60,35 +169,11 @@ function moveback(i, j)
   {
     return;
   }
-  var r = Math.sqrt(dist);
-  r = (25 - r) / 2;
-  var A = y1 - y2;
-  var B = x2 - x1;
-  var C = x1*y2 - x2*y1;
-  var h = x1;
-  var k = y1;
-  var temp = Math.sqrt(square(A) + square(B)); //   (A^2 + B^2)^1/2
-  var a = A  / temp;
-  var b = B / temp;
-  var d = (A*h + B*k + C) / temp;
-  temp = Math.sqrt(square(r) - square(d));          //    (r ^2 - d ^2)^1/2
-  var x_a = h - a*d + b*temp;
-  var x_b = h - a*d - b*temp;
-  var y_a = k - b*d + a*temp;
-  var y_b = k - b*d - a*temp;
-  /*
-   * (x,y)----------------(x1,y1)------------------(x2,y2)
-   * dist((x,y) (x1,y1)) + dist((x1,y1) (x2,y2)) = dist((x,y) (x2,y2))
-   *
-   * (x - x1)^2 + (y - y1)^2 + dist = (x - x2)^2 + (y - y2)^2
-   * 
-   */
-  var temp1 = square(x_a - x2) + square(y_a - y2);
-  temp = square(x_a - x1) + square(y_a - y1) + dist;
-  if(temp == temp1)
-  {
-    
-  }
+  var newpoints = circle_line_intersect(x1, y1, x2, y2);
+  ball_a.setx(newpoints[0]);
+  ball_a.sety(newpoints[1]);
+  ball_b.setx(newpoints[2]);
+  ball_b.sety(newpoints[3]);
 }
 
 function moveRed()
