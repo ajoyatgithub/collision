@@ -3,7 +3,7 @@ function square(number)
   return number * number;
 }
 
-function collision()
+function detect_collision()
 {
   bluecx = objBlueBall.cx();
   bluecy = objBlueBall.cy();
@@ -47,135 +47,6 @@ function collision()
   }
 }
 
-function circle_line_intersect(x1, y1, x2, y2)
-{
-  /*
-   * Two balls at (x1 y1) and (x2 y2)
-   * 
-   * dist^2 = (x1 - x2)^2 + (y1 - y2)^2
-   * 
-   * General equation of line through them : 
-   *            (2x1 - 2x2)x + (2y1 - 2y2)y + (x2^2 + y2^2 - x1^2 - y1^2 - dist) = 0
-   *                    Ax        +         By        +                        C                          = 0
-   *
-   * h = x1 & k = y1
-   * 
-   * line Ax + By + C = 0 cuts circle with center at (h,k)  and radius r = (25 - dist) / 2
-   * at (x_a, y_a) or (x_b, y_b)
-   * 
-   * where,  r is the distance from point h, k to the required point (x, y)
-   * 
-   * (x,y)----------------(h, k)------------------(x2,y2)
-   * 
-   * |<-----------r----------->|<---------dist---------->|
-   * |<--------------------------------------------------->|
-   * 
-   * Above relation can be used to determine the correct point
-   */
-  
-  var dist = Math.sqrt(square(x1 - x2) + square(y1 - y2));
-  
-  var A = 2*x1 - 2*x2;
-  var B = 2*y1 - 2*y2;
-  var C = x2^2 + y2^2 - x1^2 - y1^2 - dist;
-  
-  var h = x1;
-  var k = y1;
-  
-  var r = (25 - dist) / 2;
-  
-  var sqrtAB = Math.sqrt(square(A) + square(B)); //   (A^2 + B^2)^1/2
-  var a = A  / sqrtAB;
-  var b = B / sqrtAB;
-  var d = (A*h + B*k + C) / sqrtAB;
-  var sqrtRD = Math.sqrt(square(r) - square(d));          //    (r ^2 - d ^2)^1/2
-  var x_a = h - a*d + b*sqrtRD;
-  var x_b = h - a*d - b*sqrtRD;
-  var y_a = k - b*d + a*sqrtRD;
-  var y_b = k - b*d - a*sqrtRD; 
-  /*
-   * (x,y)----------------(x1,y1)------------------(x2,y2)
-   * dist((x,y) (x1,y1)) + dist((x1,y1) (x2,y2)) = dist((x,y) (x2,y2))
-   *
-   *    _________________                 _________________
-   * V (x - x1)^2 + (y - y1)^2 + dist = V(x - x2)^2 + (y - y2)^2
-   * 
-   */
-  
-  var c1x, c1y, c2x, c2y;
-  
-  var temp = Math.sqrt(square(x_a - x2) + square(y_a - y2));
-  var temp1 = Math.sqrt(square(x_a - x1) + square(y_a - y1)) + dist;
-  if(temp == temp1)
-  {
-    c1x = x_a;
-    c1y = y_a;
-  }
-  else
-  {
-    c1x = x_b;
-    c1y = y_b;
-  }
-  /*
-   * Points for first circle are thus c1x, c1y
-   *
-   * 
-   * For second circle
-   * 
-   * (x1, y1)------------------(h, k)----------------------(x, y)
-   *                                 (x2,y2)
-   * 
-   * |<-----------dist------------>|<------------r-------------->|
-   * |<----------------------------------------------------------->|
-   * 
-   * dist((x1,y1) (h, k)) + dist((h, k) (x,y)) = dist((x1,y1) (x,y))
-   *
-   * dist + (x2 - x_a)^2 + (y2 - y_a)^2 = (x1 - x_a)^2 + (y1 - y_a)^2
-   * 
-   */
-  
-  h = x2;
-  k = y2;
-  x_a = h - a*d + b*sqrtRD;
-  x_b = h - a*d - b*sqrtRD;
-  y_a = k - b*d + a*sqrtRD;
-  y_b = k - b*d - a*sqrtRD;
-
-  temp = Math.sqrt(square(x_a - x1) + square(y_a - y1));
-  temp1 = Math.sqrt(square(x_a - x2) + square(y_a - y2)) + dist;
-  if(temp == temp1)
-  {
-    c2x = x_a;
-    c2y = y_a;
-  }
-  else
-  {
-    c2x = x_b;
-    c2y = y_b;
-  }
-  return [c1x, c1y, c2x, c2y];
-}
-
-function moveback(i, j)
-{
-  ball_a = sprites[i];
-  ball_b = sprites[j];
-  var x1 = ball_a.cx();
-  var y1 = ball_a.cy();
-  var x2 = ball_b.cx();
-  var y2 = ball_b.cy();
-  var dist = square(x2 - x1) + square(y2 - y1);
-  if(dist == 0)
-  {
-    return;
-  }
-  var newpoints = circle_line_intersect(x1, y1, x2, y2);
-  ball_a.setx(newpoints[0]);
-  ball_a.sety(newpoints[1]);
-  ball_b.setx(newpoints[2]);
-  ball_b.sety(newpoints[3]);
-}
-
 function moveRed()
 {
   for(i =1; i<5; i++)
@@ -187,11 +58,21 @@ function moveRed()
     left = x - (rball.w / 2);
     ytop = y - (rball.h / 2);
     bottom = y + (rball.h / 2);
+
+    /*
+     * crr[0] = collision 1 & 2
+     * crr[1] = collision 1 & 3
+     * crr[2] = collision 1 & 4
+     * crr[3] = collision 2 & 3
+     * crr[4] = collision 2 & 4
+     * crr[5] = collision 3 & 4
+    */
+    
     if(right > canvas.width)
     {
       diff = right - canvas.width;
       rball.vx *= -1;
-      x -= diff; 
+      x -= diff;
     }
     else if(left < 0)
     {
@@ -213,140 +94,132 @@ function moveRed()
     }
     else if(window.cbr[i-1])
     {
-      for(i in sprites)
-      {
-        sprites[i].vx *= 0;
-        sprites[i].vy *= 0;
-      }
+      window.gameover = true;
       x = rball.cx() + rball.vx * rball.sp;
       y = rball.cy() + rball.vy * rball.sp;
     }
-    /*
-     * crr[0] = collision 1 & 2
-     * crr[1] = collision 1 & 3
-     * crr[2] = collision 1 & 4
-     * crr[3] = collision 2 & 3
-     * crr[4] = collision 2 & 4
-     * crr[5] = collision 3 & 4
-    */
-    if(window.crr[0])
-    {
-      bounce(1, 2);
-    }
-    else if(window.crr[1])
-    {
-      bounce(1, 3);
-    }
-    else if(window.crr[2])
-    {
-      bounce(1, 4);
-    }
-    else if(window.crr[3])
-    {
-      bounce(2, 3);
-    }
-    else if(window.crr[4])
-    {
-      bounce(2, 4);
-    }
-    else if(window.crr[5])
-    {
-      bounce(3, 4);
-    }
+
     rball.setx(x);
     rball.sety(y);
   }
-}
-var logmessage = "";
-var temp1 = "";
-var ctr = 0;
-
-function log_redballs()
-{
-  logdiv =document.getElementById("rbstat");
-  logdiv.innerHTML = "";
-  var logstr = "";
-  for(i=1;i<5;i++)
+  
+  detect_collision();
+  
+  if(window.crr[0])
   {
-    logstr = "Ball " + i + " : vx : " + sprites[i].vx + "; vy : " + sprites[i].vy + " (" + sprites[i].cx() + "," + sprites[i].cy() + ")</br>";
-    logdiv.innerHTML += logstr;
+    resolve_colliding(1, 2);
+  }
+  else if(window.crr[1])
+  {
+    resolve_colliding(1, 3);
+  }
+  else if(window.crr[2])
+  {
+    resolve_colliding(1, 4);
+  }
+  else if(window.crr[3])
+  {
+    resolve_colliding(2, 3);
+  }
+  else if(window.crr[4])
+  {
+    resolve_colliding(2, 4);
+  }
+  else if(window.crr[5])
+  {
+    resolve_colliding(3, 4);
   }
 }
 
-function page_log(msg)
-{
-  if(msg != logmessage && msg != temp1)
-  {
-    div_log = document.getElementById("pagelog");
-    if(ctr>50)
-    {
-      return;
-    }
-    div_log.innerHTML += msg;
-    temp1 = logmessage;
-    logmessage = msg;
-    ctr++;
-  }
-}
-
-function bounce(i, j)
+function resolve_colliding(i, j)
 {
   b1 = sprites[i];
   b2 = sprites[j];
-  mesg = "B1 is " + b1.vx + ", " + b1.vy + " and B2 is " + b2.vx + ", " + b2.vy;
-  if(b1.vx != b2.vx && b1.vy == b2.vy)
-  {
-    b1.vx *= -1;
-    b2.vx *= -1;
-    mesg += " Case 1 </br>";
-  }
-  else if(b1.vy != b2.vy && b1.vx == b2.vx)
-  {
-    b1.vy *= -1;
-    b2.vy *= -1;
-    mesg += "Case 2 </br>";
-  }
-  else if(b1.vx == b1.vy && b2.vx == b2.vy || b1.vx != b1.vy && b2.vx != b2.vy)
-  {
-    b1.vx *= -1;
-    b1.vy *= -1;
-    b2.vx *= -1;
-    b2.vy *= -1;
-    mesg += "Case 3 </br>";
-  }
-  else
-  {
-    b1.vx *= -1;
-    b1.vy *= -1;
-    b2.vx *= -1;
-    b2.vy *= -1;
-    mesg += "Case else </br>";
-  }
-  moveback(i, j);
-  page_log(mesg);
-  /*
-   * vx1 != vx2 && vy1 == vy2 ==>> x * -1
+  
+  // The velocity vectors V1 and V2
+  var v1x = b1.vx;
+  var v1y = b1.vy;
+  var v2x = b2.vx;
+  var v2y = b2.vy;
+  
+  // The normal at the point of the collision
+  var nx = b1.cx() - b2.cx();
+  var ny = b1.cy() - b2.cy();
+  
+  // The unit normal vector
+  var n_mag = Math.sqrt(square(nx) + square(ny));
+  var unx = nx / n_mag;
+  var uny = ny / n_mag;
+  
+  // The unit tangent vector at the point of collision
+  var utx = uny*-1;
+  var uty = unx;
+  
+  // Projecting the velocity vectors onto the tangent 
+  // and normal vectors
+  var v1n = unx * v1x + uny * v1y;
+  
+  var v2n = unx * v2x + uny * v2y;
+  
+  var v1t = utx * v1x + uty * v1y;
+  
+  var v2t = utx * v2x + uty * v2y;
+  
+  /* Calculating the resultant vectors
+   * Vector v1t & v2t do not change
    * 
-   * 
-  */
-  //b1.vx *= -1;
-  //b1.vy *= -1;
-  //b2.vx *= -1;
-  //b2.vy *= -1;
+   * Since both the balls have the same mass,
+   * v1n and v2n are swapped
+   */
+  
+  var temp = v1n;
+  v1n = v2n;
+  v2n = temp;
+  
+  /* Reassigning the resultant vectors to the new 
+   * velocity vectors
+   */
+  
+  var v1nx = v1n * unx;
+  var v1ny = v1n * uny;
+  
+  var v1tx = v1t * utx;
+  var v1ty = v1t * uty;
+  
+  var v2nx = v2n * unx;
+  var v2ny = v2n * uny;
+  
+  var v2tx = v2t * utx;
+  var v2ty = v2t * uty;
+
+  // New vellocity vectors 
+  v1x = v1nx + v1tx;
+  v1y = v1ny + v1ty;
+  v2x = v2nx + v2tx;
+  v2y = v2ny + v2ty;
+  
+  b1.vx = v1x;
+  b1.vy = v1y;
+  b2.vx = v2x;
+  b2.vy = v2y;
+  
+  //moveback(i, j);
+  //page_log(mesg);
 }
 
 function update() 
 {
   //Create the animation loop
-  collision();
-  moveRed();
-  window.requestAnimationFrame(update, canvas); 
-  render();
+  if(window.gameover == false)
+  {
+    moveRed();
+    window.requestAnimationFrame(update, canvas); 
+    render();
+  }
 } 
 
 function render()
 { 
-  log_redballs();
   //Clear the previous animation frame
   surface.clearRect(0, 0, canvas.width, canvas.height);
   //Loop through all the sprites in the "sprites" array and use their properties to display them
@@ -400,6 +273,9 @@ function loadImage()
   //Update the sprite as soon as the image has been loaded
   update(); 
 }
+
+//Variable to check game state
+window.gameover = false;
 
 //Array to check collision of blue red
 window.cbr = new Array(4);
