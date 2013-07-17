@@ -98,7 +98,6 @@ function moveRed()
       x = rball.cx() + rball.vx * rball.sp;
       y = rball.cy() + rball.vy * rball.sp;
     }
-
     rball.setx(x);
     rball.sety(y);
   }
@@ -137,33 +136,33 @@ function resolve_colliding(i, j)
   b2 = sprites[j];
   
   // The velocity vectors V1 and V2
-  var v1x = b1.vx;
-  var v1y = b1.vy;
-  var v2x = b2.vx;
-  var v2y = b2.vy;
   
-  // The normal at the point of the collision
-  var nx = b1.cx() - b2.cx();
-  var ny = b1.cy() - b2.cy();
+  var v1 = Object.create(vector);
+  v1.setxy(b1.vx, b1.vy);
   
+  var v2 = Object.create(vector);
+  v2.setxy(b2.vx, b2.vy);
+  
+  // The normal vector at the point of the collision
+  var un = Object.create(vector);
+  un.setxy(b1.cx() - b2.cx(), b1.cy() - b2.cy());
+
   // The unit normal vector
-  var n_mag = Math.sqrt(square(nx) + square(ny));
-  var unx = nx / n_mag;
-  var uny = ny / n_mag;
+  un.unit_vector();
   
   // The unit tangent vector at the point of collision
-  var utx = uny*-1;
-  var uty = unx;
+  var ut = Object.create(vector);
+  ut.setxy(-1*un.vy, un.vx);
   
   // Projecting the velocity vectors onto the tangent 
   // and normal vectors
-  var v1n = unx * v1x + uny * v1y;
+  var v1n = v1.dot_vector(un);
   
-  var v2n = unx * v2x + uny * v2y;
+  var v2n = v2.dot_vector(un);
   
-  var v1t = utx * v1x + uty * v1y;
+  var v1t = v1.dot_vector(ut);
   
-  var v2t = utx * v2x + uty * v2y;
+  var v2t = v2.dot_vector(ut);
   
   /* Calculating the resultant vectors
    * Vector v1t & v2t do not change
@@ -179,32 +178,27 @@ function resolve_colliding(i, j)
   /* Reassigning the resultant vectors to the new 
    * velocity vectors
    */
+  var new_v1n = Object.create(vector);
+  new_v1n.scalar_vector(v1n, un);
+
+  var new_v1t = Object.create(vector);
+  new_v1t.scalar_vector(v1n, ut);
   
-  var v1nx = v1n * unx;
-  var v1ny = v1n * uny;
+  var new_v2n = Object.create(vector);
+  new_v2n.scalar_vector(v2n, un);
   
-  var v1tx = v1t * utx;
-  var v1ty = v1t * uty;
-  
-  var v2nx = v2n * unx;
-  var v2ny = v2n * uny;
-  
-  var v2tx = v2t * utx;
-  var v2ty = v2t * uty;
+  var new_v2t = Object.create(vector);
+  new_v2t.scalar_vector(v2t, ut);
 
   // New vellocity vectors 
-  v1x = v1nx + v1tx;
-  v1y = v1ny + v1ty;
-  v2x = v2nx + v2tx;
-  v2y = v2ny + v2ty;
+  v1.add_vector(new_v1n, new_v1t);
+  v2.add_vector(new_v2n, new_v2t)
   
-  b1.vx = v1x;
-  b1.vy = v1y;
-  b2.vx = v2x;
-  b2.vy = v2y;
+  b1.vx = v1.vx;
+  b1.vy = v1.vy;
+  b2.vx = v2.vx;
+  b2.vy = v2.vy;
   
-  //moveback(i, j);
-  //page_log(mesg);
 }
 
 function update() 
@@ -310,6 +304,35 @@ canvas = document.getElementById("cv");
 canvas.style.cursor = "none";
 surface = canvas.getContext("2d");
 //--- The sprite object
+
+var vector =
+{
+  vx: 0,
+  vy: 0,
+  mag: 0,
+  add_vector: function(vector, vector1)
+  {
+    this.setxy(vector.vx + vector1.vx, vector.vy + vector1.vy);
+  },
+  dot_vector: function(vector)
+  {
+    return this.vx * vector.vx + this.vy * vector.vy;
+  },
+  scalar_vector: function(scalar, vector)
+  {
+    this.setxy(scalar*vector.vx, scalar*vector.vy);
+  },
+  setxy: function(x, y)
+  {
+    this.vx = x;
+    this.vy = y;
+    this.mag = Math.sqrt(square(x) + square(y));
+  },
+  unit_vector: function()
+  {
+    this.setxy(this.vx / this.mag, this.vy / this.mag);
+  },
+};
 
 var sprite = 
 { 
