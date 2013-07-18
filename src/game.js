@@ -38,7 +38,7 @@ function detect_collision()
       rjcx = rj.cx();
       rjcy = rj.cy();
       dist = square((ricx - rjcx)) + square((ricy - rjcy));
-      if(dist <= 625)
+      if(dist <= 676)
       {
         // Resolve collisions on detection
         resolve_colliding(ri, rj);
@@ -187,7 +187,7 @@ function render()
   }
   else
   {
-    add_ball_sprite(200, 200);
+    add_ball_sprite(200, 200, 0);
     window.count = 0;
     window.gameScore++;
   }
@@ -252,13 +252,22 @@ function gameStart()
   }, 1000);
 }
 
-function add_ball_sprite(x, y)
+function add_ball_sprite(x, y, i)
 {
   objBall = Object.create(sprite);
   objBall.setx(Math.random() * 200 + x);
   objBall.sety(Math.random() * 200 + y);
-  objBall.vx = -1;
-  objBall.vy = -1;
+  objBall.vx = -1 * Math.random();
+  objBall.vy = Math.random();
+  if(i==0)
+  {
+    objBall.vx = 0;
+    objBall.vy = 0;
+    setTimeout(function(){
+      sprites[sprites.length - 1].vx = 1;
+      sprites[sprites.length - 1].vy = 1;
+    }, 1000);
+  }
   sprites.push(objBall);
 }
 
@@ -361,7 +370,7 @@ var sprite =
 var sprites = []; 
 
 // Sprite for the blue ball
-add_ball_sprite(200, 200);
+add_ball_sprite(200, 200, 1);
 
 var imgBlueBall = new Image();
 imgBlueBall.addEventListener("load", loadImage, false);
@@ -371,10 +380,10 @@ canvas.addEventListener("mousemove",mousemoveHandle, false);
 
 // Adding sprites for the red balls
 
-add_ball_sprite(0, 0);
-add_ball_sprite(0, 200);
-add_ball_sprite(200, 0);
-add_ball_sprite(200, 200);
+add_ball_sprite(0, 0, 1);
+add_ball_sprite(0, 200, 1);
+add_ball_sprite(200, 0, 1);
+add_ball_sprite(200, 200, 1);
 gameStart();
 
 //Load the sprite image
