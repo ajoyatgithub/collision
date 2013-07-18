@@ -180,7 +180,17 @@ function update()
 } 
 
 function render()
-{ 
+{
+  if(window.count < 3000)
+  {
+    window.count++;
+  }
+  else
+  {
+    add_ball_sprite(200, 200);
+    window.count = 0;
+    window.gameScore++;
+  }
   //Clear the previous animation frame
   surface.clearRect(0, 0, canvas.width, canvas.height);
   //Loop through all the sprites in the "sprites" array and use their properties to display them
@@ -252,9 +262,11 @@ function add_ball_sprite(x, y)
   sprites.push(objBall);
 }
 
-//Variables to check game state
+//Variables of the game
 window.gameover = false;
 window.gamestate = "paused";
+window.gameScore = 0;
+window.count = 0;
 
 canvas = document.getElementById("cv");
 canvas.style.cursor = "none";
