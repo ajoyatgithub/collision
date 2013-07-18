@@ -42,6 +42,7 @@ function detect_collision()
       {
         // Resolve collisions on detection
         resolve_colliding(ri, rj);
+        //add_ball_sprite(200, 200);
       }
     }
   }
@@ -51,9 +52,16 @@ function moveRed()
 {
   /* Assign new coordinated to the red balls
    * 
+   * Starts when the timer goes off
+   * 
    * Check if any of the balls are out of the canvas
    * If yes, reassign them to new bounced coordinates
    */
+  
+  if(window.gamestate != "started")
+  {
+    return;
+  }
   
   for(i =1; i<sprites.length; i++)
   {
@@ -227,8 +235,26 @@ function loadImage()
   update(); 
 }
 
-//Variable to check game state
+function gameStart()
+{
+  setTimeout(function(){
+    window.gamestate = "started";
+  }, 1000);
+}
+
+function add_ball_sprite(x, y)
+{
+  objBall = Object.create(sprite);
+  objBall.setx(Math.random() * 200 + x);
+  objBall.sety(Math.random() * 200 + y);
+  objBall.vx = -1;
+  objBall.vy = -1;
+  sprites.push(objBall);
+}
+
+//Variables to check game state
 window.gameover = false;
+window.gamestate = "paused";
 
 canvas = document.getElementById("cv");
 canvas.style.cursor = "none";
@@ -337,16 +363,7 @@ add_ball_sprite(0, 0);
 add_ball_sprite(0, 200);
 add_ball_sprite(200, 0);
 add_ball_sprite(200, 200);
-
-function add_ball_sprite(x, y)
-{
-  objBall = Object.create(sprite);
-  objBall.setx(Math.random() * 200 + x);
-  objBall.sety(Math.random() * 200 + y);
-  objBall.vx = -1;
-  objBall.vy = -1;
-  sprites.push(objBall);
-}
+gameStart();
 
 //Load the sprite image
 var imgRedBall = new Image(); 
