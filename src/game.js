@@ -5,19 +5,28 @@ function square(number)
 
 function detect_collision()
 {
-  bluecx = objBlueBall.cx();
-  bluecy = objBlueBall.cy();
+  // Detect blue colliding with any red ball
+  
+  bluecx = sprites[0].cx();
+  bluecy = sprites[0].cy();
+  
   for(i = 1; i < 5; i++)
   {
     rball = sprites[i];
+    
     rcx = rball.cx();
     rcy = rball.cy();
+    
     dist = square((rcx - bluecx)) + square((rcy - bluecy));
+    
     if(dist <= 625)
     {
       window.gameover = true;
     }
   }
+  
+  // Detect collisions between the red balls
+  
   for(i=1;i<4;i++)
   {
     for(j=i+1;j<5;j++)
@@ -31,7 +40,8 @@ function detect_collision()
       dist = square((ricx - rjcx)) + square((ricy - rjcy));
       if(dist <= 625)
       {
-        resolve_colliding(i, j);
+        // Resolve collisions on detection
+        resolve_colliding(ri, rj);
       }
     }
   }
@@ -39,6 +49,12 @@ function detect_collision()
 
 function moveRed()
 {
+  /* Assign new coordinated to the red balls
+   * 
+   * Check if any of the balls are out of the canvas
+   * If yes, reassign them to new bounced coordinates
+   */
+  
   for(i =1; i<5; i++)
   {
     rball = sprites[i];
@@ -80,13 +96,9 @@ function moveRed()
   detect_collision();
 }
 
-function resolve_colliding(i, j)
-{
-  b1 = sprites[i];
-  b2 = sprites[j];
-  
+function resolve_colliding(b1, b2)
+{  
   // The velocity vectors V1 and V2
-  
   var v1 = Object.create(vector);
   v1.setxy(b1.vx, b1.vy);
   
@@ -107,11 +119,8 @@ function resolve_colliding(i, j)
   // Projecting the velocity vectors onto the tangent 
   // and normal vectors
   var v1n = v1.dot_vector(un);
-  
   var v2n = v2.dot_vector(un);
-  
   var v1t = v1.dot_vector(ut);
-  
   var v2t = v2.dot_vector(ut);
   
   /* Calculating the resultant vectors
@@ -201,8 +210,8 @@ function render()
 
 function move(mousex, mousey)
 {
-  objBlueBall.setx(mousex - objBlueBall.w/2);
-  objBlueBall.sety(mousey - objBlueBall.h/2);
+  sprites[0].setx(mousex);
+  sprites[0].sety(mousey);
 }
 
 function mousemoveHandle(event)
@@ -224,7 +233,7 @@ window.gameover = false;
 canvas = document.getElementById("cv");
 canvas.style.cursor = "none";
 surface = canvas.getContext("2d");
-//--- The sprite object
+
 
 var vector =
 {
@@ -255,22 +264,20 @@ var vector =
   },
 };
 
+//--- The sprite object
 var sprite = 
 { 
   //The X and Y source position of the sprite's image and its height and width
   srcX: 0, 
   srcY: 0, 
-  srcW: 0, 
-  srcH: 0, 
+  srcW: 400, 
+  srcH: 400, 
   //The X and Y position of the sprite on the canvas as well as its height
   x: 0, 
   y: 0, 
-  w: 10, 
-  h: 10,
+  w: 25, 
+  h: 25,
   
-  //The old values of x & y
-  oldx: 0,
-  oldy: 0,
   //Direction Vectors
   vx: 0,
   vy: 0,
@@ -304,27 +311,22 @@ var sprite =
   //Setters
   setx: function(valx)
   {
-    this.oldx = this.cx();
     this.x = valx - (this.w / 2);
   },
   sety: function(valy)
   {
-    this.oldy = this.cy();
     this.y = valy - (this.h / 2);
   }
-}; 
+};
+
 //An array to store the game sprites
 var sprites = []; 
-//Create the sprite.
 
-var objBlueBall = Object.create(sprite);
-objBlueBall.x = 100;
-objBlueBall.y = 0;
-objBlueBall.w = 25;
-objBlueBall.h = 25;
-objBlueBall.srcW = 400;
-objBlueBall.srcH = 400;
-sprites.push(objBlueBall);
+//Create the sprite.
+var objBall = Object.create(sprite);
+objBall.x = 200;
+objBall.y = 200;
+sprites.push(objBall);
 
 var imgBlueBall = new Image();
 imgBlueBall.addEventListener("load", loadImage, false);
@@ -333,61 +335,33 @@ imgBlueBall.src = "../images/blue.png";
 canvas.addEventListener("mousemove",mousemoveHandle, false);
 
 //Center it on the canvas and push it into the sprites array
-var r1 = Object.create(sprite);
-var redxrand = Math.random() * 200;
-var redyrand = Math.random() * 200;
-r1.setx(redxrand);
-r1.sety(redyrand);
-r1.w = 25;
-r1.h = 25;
-r1.srcW = 400;
-r1.srcH = 400;
-r1.vx = -1;
-r1.vy = -1;
-//r1.sp = 0.1;
-sprites.push(r1);
+var objBall = Object.create(sprite);
+objBall.setx(Math.random() * 200);
+objBall.sety(Math.random() * 200);
+objBall.vx = 1;
+objBall.vy = 1;
+sprites.push(objBall);
 
-var r2 = Object.create(sprite);
-redxrand = Math.random() * 200 + 200;
-redyrand = Math.random() * 200;
-r2.setx(redxrand);
-r2.sety(redyrand);
-r2.w = 25;
-r2.h = 25;
-r2.srcW = 400;
-r2.srcH = 400;
-r2.vx = 1;
-r2.vy = -1;
-//r2.sp = 0.1;
-sprites.push(r2);
+objBall = Object.create(sprite);
+objBall.setx(Math.random() * 200);
+objBall.sety(Math.random() * 200 + 200);
+objBall.vx = 1;
+objBall.vy = -1;
+sprites.push(objBall);
 
-var r3 = Object.create(sprite);
-redxrand = Math.random() * 200;
-redyrand = Math.random() * 200 + 200;
-r3.setx(redxrand);
-r3.sety(redyrand);
-r3.w = 25;
-r3.h = 25;
-r3.srcW = 400;
-r3.srcH = 400;
-r3.vx = -1;
-r3.vy = 1;
-//r3.sp = 0.1;
-sprites.push(r3);
+objBall = Object.create(sprite);
+objBall.setx(Math.random() * 200 + 200);
+objBall.sety(Math.random() * 200);
+objBall.vx = -1;
+objBall.vy = 1;
+sprites.push(objBall);
 
-var r4 = Object.create(sprite);
-redxrand = Math.random() * 200 + 200;
-redyrand = Math.random() * 200 + 200;
-r4.setx(redxrand);
-r4.sety(redyrand);
-r4.w = 25;
-r4.h = 25;
-r4.srcW = 400;
-r4.srcH = 400;
-r4.vx = 1;
-r4.vy = -1;
-//r4.sp = 0.1;
-sprites.push(r4);
+objBall = Object.create(sprite);
+objBall.setx(Math.random() * 200 + 200);
+objBall.sety(Math.random() * 200 + 200);
+objBall.vx = -1;
+objBall.vy = -1;
+sprites.push(objBall);
 
 //Load the sprite image
 var imgRedBall = new Image(); 
