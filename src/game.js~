@@ -389,4 +389,4 @@ gameStart();
 //Load the sprite image
 var imgRedBall = new Image(); 
 imgRedBall.addEventListener("load", loadImage, false); 
-imgRedBall.src = "../images/red.png";
+imgRedBall.src = "../images/red1.png";
