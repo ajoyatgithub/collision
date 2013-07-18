@@ -15,14 +15,9 @@ function detect_collision()
     dist = square((rcx - bluecx)) + square((rcy - bluecy));
     if(dist <= 625)
     {
-      window.cbr[i-1] = true;
-    }
-    else
-    {
-      window.cbr[i-1] = false;
+      window.gameover = true;
     }
   }
-  window.count = 0;
   for(i=1;i<4;i++)
   {
     for(j=i+1;j<5;j++)
@@ -36,13 +31,8 @@ function detect_collision()
       dist = square((ricx - rjcx)) + square((ricy - rjcy));
       if(dist <= 625)
       {
-        window.crr[window.count] = true;
+        resolve_colliding(i, j);
       }
-      else
-      {
-        window.crr[window.count] = false;
-      }
-      window.count++;
     }
   }
 }
@@ -58,15 +48,6 @@ function moveRed()
     left = x - (rball.w / 2);
     ytop = y - (rball.h / 2);
     bottom = y + (rball.h / 2);
-
-    /*
-     * crr[0] = collision 1 & 2
-     * crr[1] = collision 1 & 3
-     * crr[2] = collision 1 & 4
-     * crr[3] = collision 2 & 3
-     * crr[4] = collision 2 & 4
-     * crr[5] = collision 3 & 4
-    */
     
     if(right > canvas.width)
     {
@@ -92,42 +73,11 @@ function moveRed()
       rball.vy *= -1;
       y += diff; 
     }
-    else if(window.cbr[i-1])
-    {
-      window.gameover = true;
-      x = rball.cx() + rball.vx * rball.sp;
-      y = rball.cy() + rball.vy * rball.sp;
-    }
     rball.setx(x);
     rball.sety(y);
   }
   
   detect_collision();
-  
-  if(window.crr[0])
-  {
-    resolve_colliding(1, 2);
-  }
-  else if(window.crr[1])
-  {
-    resolve_colliding(1, 3);
-  }
-  else if(window.crr[2])
-  {
-    resolve_colliding(1, 4);
-  }
-  else if(window.crr[3])
-  {
-    resolve_colliding(2, 3);
-  }
-  else if(window.crr[4])
-  {
-    resolve_colliding(2, 4);
-  }
-  else if(window.crr[5])
-  {
-    resolve_colliding(3, 4);
-  }
 }
 
 function resolve_colliding(i, j)
@@ -270,35 +220,6 @@ function loadImage()
 
 //Variable to check game state
 window.gameover = false;
-
-//Array to check collision of blue red
-window.cbr = new Array(4);
-for(i in window.cbr)
-{
-  window.cbr[i] = false;
-}
-
-//Array for collision of red with red
-window.crr = new Array(6);
-for(i in window.crr)
-{
-  window.crr[i] = false;
-}
-/*
-crr[0] = collision 1 & 2
-crr[1] = collision 1 & 3
-crr[2] = collision 1 & 4
-crr[3] = collision 2 & 3
-crr[4] = collision 2 & 4
-crr[5] = collision 3 & 4
-
-Collision is checked in loop
-12 13 14
-23 24
-34
-
-
-*/
 
 canvas = document.getElementById("cv");
 canvas.style.cursor = "none";
