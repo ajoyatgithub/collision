@@ -10,7 +10,7 @@ function detect_collision()
   bluecx = sprites[0].cx();
   bluecy = sprites[0].cy();
   
-  for(i = 1; i < 5; i++)
+  for(i = 1; i < sprites.length; i++)
   {
     rball = sprites[i];
     
@@ -27,9 +27,9 @@ function detect_collision()
   
   // Detect collisions between the red balls
   
-  for(i=1;i<4;i++)
+  for(i=1;i<sprites.length;i++)
   {
-    for(j=i+1;j<5;j++)
+    for(j=i+1;j<sprites.length;j++)
     {
       ri = sprites[i];
       rj = sprites[j];
@@ -55,7 +55,7 @@ function moveRed()
    * If yes, reassign them to new bounced coordinates
    */
   
-  for(i =1; i<5; i++)
+  for(i =1; i<sprites.length; i++)
   {
     rball = sprites[i];
     x = rball.cx() + rball.vx * rball.sp;
@@ -322,11 +322,8 @@ var sprite =
 //An array to store the game sprites
 var sprites = []; 
 
-//Create the sprite.
-var objBall = Object.create(sprite);
-objBall.x = 200;
-objBall.y = 200;
-sprites.push(objBall);
+// Sprite for the blue ball
+add_ball_sprite(200, 200);
 
 var imgBlueBall = new Image();
 imgBlueBall.addEventListener("load", loadImage, false);
@@ -334,34 +331,22 @@ imgBlueBall.src = "../images/blue.png";
 
 canvas.addEventListener("mousemove",mousemoveHandle, false);
 
-//Center it on the canvas and push it into the sprites array
-var objBall = Object.create(sprite);
-objBall.setx(Math.random() * 200);
-objBall.sety(Math.random() * 200);
-objBall.vx = 1;
-objBall.vy = 1;
-sprites.push(objBall);
+// Adding sprites for the red balls
 
-objBall = Object.create(sprite);
-objBall.setx(Math.random() * 200);
-objBall.sety(Math.random() * 200 + 200);
-objBall.vx = 1;
-objBall.vy = -1;
-sprites.push(objBall);
+add_ball_sprite(0, 0);
+add_ball_sprite(0, 200);
+add_ball_sprite(200, 0);
+add_ball_sprite(200, 200);
 
-objBall = Object.create(sprite);
-objBall.setx(Math.random() * 200 + 200);
-objBall.sety(Math.random() * 200);
-objBall.vx = -1;
-objBall.vy = 1;
-sprites.push(objBall);
-
-objBall = Object.create(sprite);
-objBall.setx(Math.random() * 200 + 200);
-objBall.sety(Math.random() * 200 + 200);
-objBall.vx = -1;
-objBall.vy = -1;
-sprites.push(objBall);
+function add_ball_sprite(x, y)
+{
+  objBall = Object.create(sprite);
+  objBall.setx(Math.random() * 200 + x);
+  objBall.sety(Math.random() * 200 + y);
+  objBall.vx = -1;
+  objBall.vy = -1;
+  sprites.push(objBall);
+}
 
 //Load the sprite image
 var imgRedBall = new Image(); 
