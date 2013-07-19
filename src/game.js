@@ -44,6 +44,8 @@ function detect_collision()
         // Resolve collisions on detection
         resolve_colliding(ri, rj);
         //add_ball_sprite(200, 200);
+        var mx = (ricx + rjcx) / 2;
+        var my = (ricy + rjcy) / 2;
       }
     }
   }
@@ -322,7 +324,7 @@ function add_ball_sprite(x, y, i)
     objBall.vx = 0;
     objBall.vy = 0;
     setTimeout(function(){
-      sprites[sprites.length - 1].vx = 1;
+      sprites[sprites.length - 1].vx = 0;
       sprites[sprites.length - 1].vy = 1;
     }, 1000);
   }
@@ -367,7 +369,7 @@ var sprite = //--- The sprite object
   srcH: 400, 
   //The X and Y position of the sprite on the canvas as well as its height
   x: 0, 
-  y: 0, 
+  y: 50, 
   w: 25, 
   h: 25,
   

@@ -126,13 +126,13 @@ function falldown()
     if(right > canvas.width)
     {
       diff = right - canvas.width;
-      ball.vx *= -0.8;
+      ball.vx *= -0.2;
       x -= diff;
     }
     else if(left < 0)
     {
       diff = 0 - left;
-      ball.vx *= -0.8;
+      ball.vx *= -0.2;
       x += diff; 
     }
     else if(bottom > canvas.height)
@@ -322,7 +322,7 @@ function add_ball_sprite(x, y, i)
     objBall.vx = 0;
     objBall.vy = 0;
     setTimeout(function(){
-      sprites[sprites.length - 1].vx = 1;
+      sprites[sprites.length - 1].vx = 0;
       sprites[sprites.length - 1].vy = 1;
     }, 1000);
   }
@@ -367,7 +367,7 @@ var sprite = //--- The sprite object
   srcH: 400, 
   //The X and Y position of the sprite on the canvas as well as its height
   x: 0, 
-  y: 0, 
+  y: 50, 
   w: 25, 
   h: 25,
   
