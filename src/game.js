@@ -21,7 +21,8 @@ function detect_collision()
     
     if(dist <= 625)
     {
-      window.gameover = true;
+      window.gamestate = "gameover";
+      window.gravity = 0.05;
     }
   }
   
@@ -104,6 +105,54 @@ function moveRed()
   detect_collision();
 }
 
+function falldown()
+{
+  if(window.gamestate != "gameover")
+  {
+    return ;
+  }
+  
+  for(i =0; i<sprites.length; i++)
+  {
+    ball = sprites[i];
+    ball.vy += window.gravity;
+    x = ball.cx() + ball.vx * ball.sp;
+    y = ball.cy() + ball.vy * ball.sp;
+    right = (ball.w / 2) + x;
+    left = x - (ball.w / 2);
+    ytop = y - (ball.h / 2);
+    bottom = y + (ball.h / 2);
+    
+    if(right > canvas.width)
+    {
+      diff = right - canvas.width;
+      ball.vx *= -0.2;
+      x -= diff;
+    }
+    else if(left < 0)
+    {
+      diff = 0 - left;
+      ball.vx *= -0.2;
+      x += diff; 
+    }
+    else if(bottom > canvas.height)
+    {
+      diff = bottom - canvas.height;
+      ball.vy *= -0.6;
+      y -= diff;
+    }
+    else if(ytop < 0)
+    {
+      diff = 0 - ytop;
+      ball.vy *= -1;
+      y += diff; 
+    }
+    ball.setx(x);
+    ball.sety(y);
+  }
+  detect_collision();
+}
+
 function resolve_colliding(b1, b2)
 {  
   // The velocity vectors V1 and V2
@@ -171,9 +220,15 @@ function resolve_colliding(b1, b2)
 function update() 
 {
   //Create the animation loop
-  if(window.gameover == false)
+  if(window.gamestate == "started" || window.gamestate == "starting")
   {
     moveRed();
+    window.requestAnimationFrame(update, canvas); 
+    render();
+  }
+  else if(window.gamestate == "gameover")
+  {
+    falldown();
     window.requestAnimationFrame(update, canvas); 
     render();
   }
@@ -181,11 +236,11 @@ function update()
 
 function render()
 {
-  if(window.count < 3000)
+  if(window.count < 3000 && window.gamestate == "started")
   {
     window.count++;
   }
-  else
+  else if(window.gamestate == "started")
   {
     add_ball_sprite(200, 200, 0);
     window.count = 0;
@@ -236,7 +291,10 @@ function mousemoveHandle(event)
 {
   mouseX = event.pageX - canvas.offsetLeft;
   mouseY = event.pageY - canvas.offsetTop;
-  move(mouseX, mouseY);
+  if(window.gamestate == "started" || window.gamestate == "starting")
+  {
+    move(mouseX, mouseY);
+  }
 }
 
 function loadImage() 
@@ -249,7 +307,7 @@ function gameStart()
 {
   setTimeout(function(){
     window.gamestate = "started";
-  }, 1000);
+  }, 2000);
 }
 
 function add_ball_sprite(x, y, i)
@@ -270,17 +328,6 @@ function add_ball_sprite(x, y, i)
   }
   sprites.push(objBall);
 }
-
-//Variables of the game
-window.gameover = false;
-window.gamestate = "paused";
-window.gameScore = 0;
-window.count = 0;
-
-canvas = document.getElementById("cv");
-canvas.style.cursor = "none";
-surface = canvas.getContext("2d");
-
 
 var vector =
 {
@@ -311,8 +358,7 @@ var vector =
   },
 };
 
-//--- The sprite object
-var sprite = 
+var sprite = //--- The sprite object
 { 
   //The X and Y source position of the sprite's image and its height and width
   srcX: 0, 
@@ -365,6 +411,16 @@ var sprite =
     this.y = valy - (this.h / 2);
   }
 };
+
+//Variables of the game
+window.gamestate = "starting";
+window.gameScore = 0;
+window.count = 0;
+window.gravity = 0.1;
+
+canvas = document.getElementById("cv");
+canvas.style.cursor = "none";
+surface = canvas.getContext("2d");
 
 //An array to store the game sprites
 var sprites = []; 
