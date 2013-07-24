@@ -12,12 +12,7 @@ function detect_collision()
     {
       ri = sprites[i];
       rj = sprites[j];
-      ricx = ri.cx();
-      ricy = ri.cy();
-      rjcx = rj.cx();
-      rjcy = rj.cy();
-      dist = Math.sqrt(square((ricx - rjcx)) + square((ricy - rjcy)));
-      if(dist <= 25)
+      if(ball_dist(ri, rj) <= ri.w)
       {
         if(i==0 && window.gamestate == "started")
         {
@@ -28,7 +23,8 @@ function detect_collision()
         {
           // Resolve collisions on detection
           resolve_colliding(ri, rj);
-          var diff = (25 - dist) / 2;
+          /*
+          var diff = (ball.w - dist) / 2;
           if(diff > Math.sqrt(square(ri.vx) + square(ri.vy)))
           {
             var points = uncollide(ri.cx(), ri.cy(), rj.cx(), rj.cy());
@@ -37,6 +33,7 @@ function detect_collision()
             rj.setx(points[2]);
             rj.sety(points[3]);
           }
+          */
         }
         else if(window.gamestate == "gameover")
         {
@@ -54,7 +51,7 @@ function uncollide(x1, y1, x2, y2)
    * 
    * Find their midpoint (h, k) : Find Ax + By + C = 0 
    * through their centers. Find the two intersection 
-   * points on line by the circle C(h, k) - radius 25
+   * points on line by the circle C(h, k) - radius ball.w
    * 
    * General equation of line through their centers : 
    *            (2x2 - 2x1)x + (2y2 - 2y1)y + (x1^2 + y1^2 - x2^2 - y2^2) = 0
@@ -63,7 +60,7 @@ function uncollide(x1, y1, x2, y2)
    * h = (x1 + x2) / 2
    * k = (y1 + y2) / 2
    * 
-   * line Ax + By + C = 0 cuts circle with center at (h,k)  and radius r = 25
+   * line Ax + By + C = 0 cuts circle with center at (h,k)  and radius r = ball.w
    * at (x_a, y_a) and  (x_b, y_b)
    * 
    * where,  r is the distance from point h, k to the required point (x, y)
@@ -77,7 +74,7 @@ function uncollide(x1, y1, x2, y2)
   var h = (x1 + x2) / 2;
   var k = (y1 + y2) / 2;
   
-  var r = 25;
+  var r = sprites[0].w;
   
   var sqrtAB = Math.sqrt(square(A) + square(B)); //   (A^2 + B^2)^1/2
   var a = A  / sqrtAB;
@@ -196,8 +193,21 @@ function falldown()
   detect_collision();
 }
 
+function ball_dist(i, j)
+{
+  var x1 = i.cx();
+  var y1 = i.cy();
+  var x2 = j.cx();
+  var y2 = j.cy();
+  return Math.sqrt(square(x2 - x1) + square(y2 - y1));
+}
+
 function resolve_colliding(b1, b2)
-{  
+{
+  if(ball_dist(b1, b2) > b1.w)
+  {
+    return ;
+  }
   // The velocity vectors V1 and V2
   var v1 = Object.create(vector);
   v1.setxy(b1.vx, b1.vy);
@@ -252,12 +262,11 @@ function resolve_colliding(b1, b2)
   // New vellocity vectors 
   v1.add_vector(new_v1n, new_v1t);
   v2.add_vector(new_v2n, new_v2t)
-  
+
   b1.vx = v1.vx;
   b1.vy = v1.vy;
   b2.vx = v2.vx;
   b2.vy = v2.vy;
-  
 }
 
 function update() 
@@ -411,8 +420,8 @@ var sprite = //--- The sprite object
   //The X and Y position of the sprite on the canvas as well as its height
   x: 0, 
   y: 50, 
-  w: 25, 
-  h: 25,
+  w: 20, 
+  h: 20,
   
   //Direction Vectors
   vx: 0,
@@ -466,7 +475,7 @@ canvas.style.cursor = "none";
 surface = canvas.getContext("2d");
 
 //An array to store the game sprites
-var sprites = []; 
+var sprites = [];
 
 // Sprite for the blue ball
 add_ball_sprite(200, 200, 1);
