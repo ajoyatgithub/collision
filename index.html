@@ -1,18 +1,17 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
-<title>Collision Game</title>
-<style>
-canvas
-{
-  border:1px solid black;
-}
-</style>
-</head>
-<body>
-<h1>Collision</h1>
-<h3>Move the cursor to prevent the blue ball from colliding with the red ones.</h3>
-<canvas width="400" height="400" id="cv"></canvas>
-<script src="game.js" type="text/javascript"></script>
-</body>
+	<head>
+		<title>Collision Game</title>
+		<link rel="stylesheet" href="css/collision.css" type="text/css" />
+	</head>
+	<body>
+		<h1>Collision</h1>
+		<p>A simple JS collision game</p>
+		<div id="game">
+			<canvas width="400" height="400" id="canvas"></canvas>
+		</div>
+		<p>Move the cursor to prevent the blue ball from colliding with the red ones.</p>
+		<script src="js/collision.js" type="text/javascript"></script>
+		<script src="js/jquery-1.10.2.js" type="text/javascript"></script>
+	</body>
 </html>
