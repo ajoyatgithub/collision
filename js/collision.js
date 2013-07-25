@@ -343,6 +343,7 @@ function mousemoveHandle(event)
 {
 	mouseX = event.pageX - canvas.offsetLeft;
 	mouseY = event.pageY - canvas.offsetTop;
+	//console.log(mouseX + " = " + event.pageX + " - " + canvas.offsetLeft + " & " + mouseY + " = " + event.pageY + " -  " + canvas.offsetTop + " Ball " + sprites[0].cx() + " " + sprites[0].cy());
 	if(window.gamestate == "started" || window.gamestate == "starting")
 	{
 		move(mouseX, mouseY);

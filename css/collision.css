@@ -1,15 +1,24 @@
+/*{
+	border: 1px solid #000;
+}*/
 body{
-	text-align: center;
 	background: #922;
 }
 h1{
 	font-family: arial;
 	font-size: 250%;
 	text-shadow: 0px 1px 7px #fff;
+	-webkit-transition: all 0.3s linear;
+	text-align: center;
+}
+h1:hover{
+	-webkit-transition: all 0.1s linear;
+	-webkit-transform: scale3d(1.5, 1.5, 1.5);
 }
 #game{
-	vertical-align: middle;
-	position: relative;
+	width: 400px;
+	height: 400px;
+	margin: 0px auto 0px auto;
 }
 h1+p{
 	font-family: monospace;
@@ -18,11 +27,11 @@ h1+p{
 p{
 	font-family: times;
 	font-size: 20px;
+	text-align: center;
 }
 #canvas{
-	top: 10%;
-	position: relative;
-	text-align: center;
+	width: 400px;
+	height: 400px;
 	border: 1px solid #000;
 	background: #fff;
 }
