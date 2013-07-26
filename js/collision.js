@@ -307,30 +307,25 @@ function render()
 		{
 			if(i==0)
 			{
-				var sprite = sprites[i];
-				surface.drawImage
-				(
-					imgBlueBall,
-					sprite.srcX, sprite.srcY,
-					sprite.srcW, sprite.srcH,
-					Math.floor(sprite.x), Math.floor(sprite.y),
-					sprite.w, sprite.h
-					);
+				var rgbColor = "rgb(0, 0, 255)";
+				drawCircle(sprites[i].cx(), sprites[i].cy(), sprites[i].w / 2, rgbColor);
 				}
 			else
 			{
-				var sprite = sprites[i];
-				surface.drawImage
-				(
-					imgRedBall,
-					sprite.srcX, sprite.srcY,
-					sprite.srcW, sprite.srcH,
-					Math.floor(sprite.x), Math.floor(sprite.y),
-					sprite.w, sprite.h
-				);
+				var rgbColor = "rgb(255, 0, 0)";
+				drawCircle(sprites[i].cx(), sprites[i].cy(), sprites[i].w / 2, rgbColor);
 			}
 		}
 	}
+}
+
+function drawCircle(x, y, radius, color)
+{
+	surface.fillStyle = color;
+	surface.beginPath();
+	surface.arc(x, y, radius, 0, Math.PI*2, true);
+	surface.closePath();
+	surface.fill();
 }
 
 function move(mousex, mousey)
@@ -358,6 +353,7 @@ function loadImage()
 
 function gameStart()
 {
+	update();
 	setTimeout(function(){
 	window.gamestate = "started";
 	}, 2000);
@@ -413,11 +409,6 @@ var vector =
 
 var sprite =
 {
-	//The X and Y source position of the sprite's image and its height and width
-	srcX: 0,
-	srcY: 0,
-	srcW: 400,
-	srcH: 400,
 	//The X and Y position of the sprite on the canvas as well as its height
 	x: 0,
 	y: 50,
@@ -481,10 +472,6 @@ var sprites = [];
 // Sprite for the blue ball
 add_ball_sprite(200, 200, 1);
 
-var imgBlueBall = new Image();
-imgBlueBall.addEventListener("load", loadImage, false);
-imgBlueBall.src = "images/blue.png";
-
 canvas.addEventListener("mousemove",mousemoveHandle, false);
 
 // Adding sprites for the red balls
@@ -494,8 +481,3 @@ add_ball_sprite(0, 200, 1);
 add_ball_sprite(200, 0, 1);
 add_ball_sprite(200, 200, 1);
 gameStart();
-
-//Load the sprite image
-var imgRedBall = new Image();
-imgRedBall.addEventListener("load", loadImage, false);
-imgRedBall.src = "images/red.png";
