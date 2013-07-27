@@ -23,17 +23,6 @@ function detect_collision()
 				{
 					// Resolve collisions on detection
 					resolve_colliding(ri, rj);
-					/*
-					var diff = (ball.w - dist) / 2;
-					if(diff > Math.sqrt(square(ri.vx) + square(ri.vy)))
-					{
-					var points = uncollide(ri.cx(), ri.cy(), rj.cx(), rj.cy());
-					ri.setx(points[0]);
-					ri.sety(points[1]);
-					rj.setx(points[2]);
-					rj.sety(points[3]);
-					}
-					*/
 				}
 				else if(window.gamestate == "gameover")
 				{
@@ -202,6 +191,11 @@ function ball_dist(i, j)
 	return Math.sqrt(square(x2 - x1) + square(y2 - y1));
 }
 
+function point_dist(ix, iy, jx, jy)
+{
+	return Math.sqrt(square(ix - jx) + square(iy - jy));
+}
+
 function resolve_colliding(b1, b2)
 {
 	if(ball_dist(b1, b2) > b1.w)
@@ -267,6 +261,28 @@ function resolve_colliding(b1, b2)
 	b1.vy = v1.vy;
 	b2.vx = v2.vx;
 	b2.vy = v2.vy;
+
+	checkOverlap(b1, b2);
+}
+
+function checkOverlap (b1, b2)
+{
+	var bx1 = b1.cx() + b1.vx * b1.sp;
+	var by1 = b1.cy() + b1.vy * b1.sp;
+	var bx2 = b2.cx() + b2.vx * b2.sp;
+	var by2 = b2.cy() + b2.vy * b2.sp;
+	if(point_dist(bx1, by1, bx2, by2) < (b1.w / 2))
+	{
+		b1.sp += 0.1;
+		b2.sp += 0.1;
+		checkOverlap(b1, b2);
+	}
+	else
+	{
+		//b1.sp -= 0.1;
+		//b2.sp -= 0.1;
+		return;
+	}
 }
 
 function update()
@@ -364,14 +380,14 @@ function add_ball_sprite(x, y, i)
 	objBall = Object.create(sprite);
 	objBall.setx(Math.random() * 200 + x);
 	objBall.sety(Math.random() * 200 + y);
-	objBall.vx = -1 * Math.random();
-	objBall.vy = Math.random();
+	objBall.vx = Math.round(Math.random() - 1);
+	objBall.vy = Math.ceil(Math.random());
 	if(i==0)
 	{
 		objBall.vx = 0;
 		objBall.vy = 0;
 		setTimeout(function(){
-			sprites[sprites.length - 1].vx = 0;
+			sprites[sprites.length - 1].vx = 1;
 			sprites[sprites.length - 1].vy = 1;
 		}, 1000);
 	}
