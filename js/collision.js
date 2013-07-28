@@ -273,14 +273,10 @@ function checkOverlap (b1, b2)
 	var by2 = b2.cy() + b2.vy * b2.sp;
 	if(point_dist(bx1, by1, bx2, by2) < (b1.w / 2))
 	{
-		b1.sp += 0.1;
-		b2.sp += 0.1;
 		checkOverlap(b1, b2);
 	}
 	else
 	{
-		//b1.sp -= 0.1;
-		//b2.sp -= 0.1;
 		return;
 	}
 }
@@ -423,6 +419,12 @@ var vector =
 	},
 };
 
+var history = [
+{
+	
+}
+];
+
 var sprite =
 {
 	//The X and Y position of the sprite on the canvas as well as its height
@@ -435,7 +437,7 @@ var sprite =
 	vx: 0,
 	vy: 0,
 	//Magnitude
-	sp: 1,
+	sp: 10,
 	//Getters
 	cx: function()
 	{
