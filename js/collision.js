@@ -44,7 +44,7 @@ function uncollide(x1, y1, x2, y2)
 	*
 	* General equation of line through their centers :
 	*            (2x2 - 2x1)x + (2y2 - 2y1)y + (x1^2 + y1^2 - x2^2 - y2^2) = 0
-	*                    Ax        +         By        +                        C                  = 0
+	*                   Ax    +       By     +              C              = 0
 	*
 	* h = (x1 + x2) / 2
 	* k = (y1 + y2) / 2
@@ -130,7 +130,6 @@ function moveRed()
 		rball.setx(x);
 		rball.sety(y);
 	}
-
 	detect_collision();
 }
 
@@ -188,7 +187,7 @@ function ball_dist(i, j)
 	var y1 = i.cy();
 	var x2 = j.cx();
 	var y2 = j.cy();
-	return Math.sqrt(square(x2 - x1) + square(y2 - y1));
+	return point_dist(x1, y1, x2, y2);
 }
 
 function point_dist(ix, iy, jx, jy)
@@ -198,10 +197,23 @@ function point_dist(ix, iy, jx, jy)
 
 function resolve_colliding(b1, b2)
 {
-	if(ball_dist(b1, b2) > b1.w)
+	var dist = ball_dist(b1, b2);
+	if( dist > b1.w)
 	{
 		return ;
 	}
+	/*else if(dist < b1.w)
+	{
+		b1.vx *= -1;
+		b1.vy *= -1;
+		b2.vx *= -1;
+		b2.vx *= -1;
+		checkOverlap(b1, b2);
+		b1.vx *= -1;
+		b1.vy *= -1;
+		b2.vx *= -1;
+		b2.vx *= -1;
+	}*/
 	// The velocity vectors V1 and V2
 	var v1 = Object.create(vector);
 	v1.setxy(b1.vx, b1.vy);
@@ -267,11 +279,12 @@ function resolve_colliding(b1, b2)
 
 function checkOverlap (b1, b2)
 {
-	var bx1 = b1.cx() + b1.vx * b1.sp;
-	var by1 = b1.cy() + b1.vy * b1.sp;
-	var bx2 = b2.cx() + b2.vx * b2.sp;
-	var by2 = b2.cy() + b2.vy * b2.sp;
-	if(point_dist(bx1, by1, bx2, by2) < (b1.w / 2))
+	b1.setx(b1.cx() + b1.vx * b1.sp);
+	b1.sety(b1.cy() + b1.vy * b1.sp);
+	b2.setx(b2.cx() + b2.vx * b2.sp);
+	b2.sety(b2.cy() + b2.vy * b2.sp);
+
+	if(ball_dist(b1, b2) <= (b1.w / 2))
 	{
 		checkOverlap(b1, b2);
 	}
@@ -300,7 +313,7 @@ function update()
 
 function render()
 {
-	if(window.count < 3000 && window.gamestate == "started")
+	if(window.count < 2000 && window.gamestate == "started")
 	{
 		window.count++;
 	}
@@ -321,7 +334,7 @@ function render()
 			{
 				var rgbColor = "rgb(0, 0, 255)";
 				drawCircle(sprites[i].cx(), sprites[i].cy(), sprites[i].w / 2, rgbColor);
-				}
+			}
 			else
 			{
 				var rgbColor = "rgb(255, 0, 0)";
@@ -367,7 +380,7 @@ function gameStart()
 {
 	update();
 	setTimeout(function(){
-	window.gamestate = "started";
+		window.gamestate = "started";
 	}, 2000);
 }
 
@@ -376,8 +389,8 @@ function add_ball_sprite(x, y, i)
 	objBall = Object.create(sprite);
 	objBall.setx(Math.random() * 200 + x);
 	objBall.sety(Math.random() * 200 + y);
-	objBall.vx = Math.round(Math.random() - 1);
-	objBall.vy = Math.ceil(Math.random());
+	objBall.vx = 1;
+	objBall.vy = 1;
 	if(i==0)
 	{
 		objBall.vx = 0;
@@ -419,12 +432,6 @@ var vector =
 	},
 };
 
-var history = [
-{
-	
-}
-];
-
 var sprite =
 {
 	//The X and Y position of the sprite on the canvas as well as its height
@@ -437,7 +444,7 @@ var sprite =
 	vx: 0,
 	vy: 0,
 	//Magnitude
-	sp: 10,
+	sp: 1,
 	//Getters
 	cx: function()
 	{
@@ -493,7 +500,6 @@ add_ball_sprite(200, 200, 1);
 canvas.addEventListener("mousemove",mousemoveHandle, false);
 
 // Adding sprites for the red balls
-
 add_ball_sprite(0, 0, 1);
 add_ball_sprite(0, 200, 1);
 add_ball_sprite(200, 0, 1);
