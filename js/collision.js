@@ -12,7 +12,7 @@ function detect_collision()
 		{
 			ri = sprites[i];
 			rj = sprites[j];
-			if(ball_dist(ri, rj) <= ri.w)
+			if(ball_dist(ri, rj) < ri.w + 10)
 			{
 				if(i==0 && window.gamestate == "started")
 				{
@@ -31,51 +31,6 @@ function detect_collision()
 			}
 		}
 	}
-}
-
-function uncollide(x1, y1, x2, y2)
-{
-	/*
-	* Two balls at (x1 y1) and (x2 y2)
-	*
-	* Find their midpoint (h, k) : Find Ax + By + C = 0
-	* through their centers. Find the two intersection
-	* points on line by the circle C(h, k) - radius ball.w
-	*
-	* General equation of line through their centers :
-	*            (2x2 - 2x1)x + (2y2 - 2y1)y + (x1^2 + y1^2 - x2^2 - y2^2) = 0
-	*                   Ax    +       By     +              C              = 0
-	*
-	* h = (x1 + x2) / 2
-	* k = (y1 + y2) / 2
-	*
-	* line Ax + By + C = 0 cuts circle with center at (h,k)  and radius r = ball.w
-	* at (x_a, y_a) and  (x_b, y_b)
-	*
-	* where,  r is the distance from point h, k to the required point (x, y)
-	*
-	*/
-
-	var A = 2*x2 - 2*x1;
-	var B = 2*y2 - 2*y1;
-	var C = square(x1) + square(y1) - square(x2) - square(y2);
-
-	var h = (x1 + x2) / 2;
-	var k = (y1 + y2) / 2;
-
-	var r = sprites[0].w;
-
-	var sqrtAB = Math.sqrt(square(A) + square(B)); //   (A^2 + B^2)^1/2
-	var a = A  / sqrtAB;
-	var b = B / sqrtAB;
-	var d = (A*h + B*k + C) / sqrtAB;
-	var sqrtRD = Math.sqrt(square(r) - square(d));          //    (r ^2 - d ^2)^1/2
-	var x_a = h - a*d + b*sqrtRD;
-	var x_b = h - a*d - b*sqrtRD;
-	var y_a = k - b*d + a*sqrtRD;
-	var y_b = k - b*d - a*sqrtRD;
-
-	return [x_a, y_a, x_b, y_b ];
 }
 
 function moveRed()
@@ -187,12 +142,7 @@ function ball_dist(i, j)
 	var y1 = i.cy();
 	var x2 = j.cx();
 	var y2 = j.cy();
-	return point_dist(x1, y1, x2, y2);
-}
-
-function point_dist(ix, iy, jx, jy)
-{
-	return Math.sqrt(square(ix - jx) + square(iy - jy));
+	return Math.sqrt(square(x1 - x2) + square(y1 - y2));
 }
 
 function resolve_colliding(b1, b2)
@@ -202,7 +152,7 @@ function resolve_colliding(b1, b2)
 	{
 		return ;
 	}
-	/*else if(dist < b1.w)
+	else if(dist < b1.w)
 	{
 		b1.vx *= -1;
 		b1.vy *= -1;
@@ -213,7 +163,7 @@ function resolve_colliding(b1, b2)
 		b1.vy *= -1;
 		b2.vx *= -1;
 		b2.vx *= -1;
-	}*/
+	}
 	// The velocity vectors V1 and V2
 	var v1 = Object.create(vector);
 	v1.setxy(b1.vx, b1.vy);
@@ -279,6 +229,10 @@ function resolve_colliding(b1, b2)
 
 function checkOverlap (b1, b2)
 {
+	/* For two colliding and overlapping balls,
+	 * set their x y coordinates such that the
+	 * balls just touch
+	 */
 	b1.setx(b1.cx() + b1.vx * b1.sp);
 	b1.sety(b1.cy() + b1.vy * b1.sp);
 	b2.setx(b2.cx() + b2.vx * b2.sp);
@@ -444,7 +398,7 @@ var sprite =
 	vx: 0,
 	vy: 0,
 	//Magnitude
-	sp: 1,
+	sp: 2,
 	//Getters
 	cx: function()
 	{
