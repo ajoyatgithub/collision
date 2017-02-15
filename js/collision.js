@@ -35,7 +35,7 @@ function detect_collision()
 
 function moveRed()
 {
-	/* Assign new coordinated to the red balls
+	/* Assign new coordinates to the red balls
 	*
 	* Starts when the timer goes off
 	*
